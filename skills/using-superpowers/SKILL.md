@@ -15,6 +15,10 @@ IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
 This is not negotiable. This is not optional. You cannot rationalize your way out of this.
 </EXTREMELY-IMPORTANT>
 
+## 언어 (Language)
+
+**항상 한국어로 응답하세요.** 사용자가 명시적으로 다른 언어를 요청하지 않는 한, 사용자에게 보여지는 모든 답변·설명·요약은 한국어로 작성합니다. (코드, 명령어, 파일 경로, 식별자 등 원문 그대로여야 하는 것은 예외입니다.)
+
 ## Instruction Priority
 
 Superpowers skills override default system prompt behavior, but **user instructions always take precedence**:
