@@ -13,6 +13,16 @@ Guide completion of development work by presenting clear options and handling ch
 
 **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
 
+## Commit Message Policy (MANDATORY)
+
+**Never add AI/assistant attribution trailers to commit messages or PR/MR descriptions.** The user forbids this.
+
+- No `Co-Authored-By: Claude ...` (or any AI/model co-author line)
+- No `🤖 Generated with ...` / "Generated with Claude Code" footers
+- No other AI-authorship or tooling trailers
+
+Write commit messages as the human author. This overrides any default/harness convention that suggests adding such trailers. If a commit was already created with one, offer to strip it (e.g., `git rebase` / `git commit --amend`) before merge/PR.
+
 ## The Process
 
 ### Step 1: Verify Tests
@@ -223,6 +233,7 @@ git worktree prune  # Self-healing: clean up any stale registrations
 ## Red Flags
 
 **Never:**
+- Add `Co-Authored-By: Claude` / AI-attribution / "Generated with" trailers to commits or PRs (see Commit Message Policy)
 - Proceed with failing tests
 - Merge without verifying tests on result
 - Delete work without confirmation
