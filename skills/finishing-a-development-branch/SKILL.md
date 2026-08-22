@@ -9,7 +9,7 @@ description: Use when implementation is complete, all tests pass, and you need t
 
 Guide completion of development work by presenting clear options and handling chosen workflow.
 
-**Core principle:** Verify tests → Detect environment → Present options → Execute choice → Clean up.
+**Core principle:** Verify tests → Detect environment → Present options → Write understanding doc (PR paths) → Execute choice → Clean up.
 
 **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
 
@@ -102,6 +102,35 @@ Which option?
 
 **Don't add explanation** - keep options concise.
 
+### Step 4.5: Write the Understanding Doc
+
+**Runs only on the PR/MR paths** — standard-menu Option 2, or detached-HEAD Option 1. Skip it for local merge, keep-as-is, and discard.
+
+**REQUIRED SUB-SKILL:** Use superpowers:explain-pr.
+
+You are the agent who just did this work. Why this approach, what was tried and abandoned, which traps a reviewer will hit — that context lives in this session and nowhere else. Once you push and the session ends, it is gone. Write it down before it is.
+
+Run explain-pr on the **warm** path:
+
+```bash
+# run from the explain-pr skill directory (its scripts/ subdir)
+gather.sh --base <base-branch> --out /tmp/explain-pr-bundle.md
+```
+
+Fill `template.md` from session context — the bundle supplies only the mechanical diff — save to `docs/work/<slug>/understanding.md`, and **commit it before pushing** so it lands in the PR.
+
+**What Step 5 needs from this step:**
+- `docs/work/<slug>/understanding.md`, committed on the branch
+- A PR-body block to paste or pass via `--body-file`:
+
+  ```
+  ## 개발자 이해문서
+  <요약 3줄>
+  → docs/work/<slug>/understanding.md
+  ```
+
+Do not push until the explain-pr exit checklist passes.
+
 ### Step 5: Execute Choice
 
 #### Option 1: Merge Locally
@@ -130,10 +159,21 @@ git branch -d <feature-branch>
 
 #### Option 2: Push and Create PR
 
+**Step 4.5 must be complete first** — understanding doc committed, PR-body block in hand.
+
 ```bash
-# Push branch
+# Push branch (the understanding doc rides along in the commits)
 git push -u origin <feature-branch>
 ```
+
+Create the PR/MR with the understanding-doc block at the top of the body:
+
+```bash
+gh pr create --base <base-branch> --body-file <body.md>                        # GitHub
+glab mr create --target-branch <base-branch> --description "$(cat <body.md>)"  # GitLab
+```
+
+**No gh/glab installed:** push, then print the compare URL together with the PR-body block for your human partner to paste.
 
 **Do NOT clean up worktree** — user needs it alive to iterate on PR feedback.
 
@@ -193,12 +233,14 @@ git worktree prune  # Self-healing: clean up any stale registrations
 
 ## Quick Reference
 
-| Option | Merge | Push | Keep Worktree | Cleanup Branch |
-|--------|-------|------|---------------|----------------|
-| 1. Merge locally | yes | - | - | yes |
-| 2. Create PR | - | yes | yes | - |
-| 3. Keep as-is | - | - | yes | - |
-| 4. Discard | - | - | - | yes (force) |
+| Option | Understanding Doc | Merge | Push | Keep Worktree | Cleanup Branch |
+|--------|-------------------|-------|------|---------------|----------------|
+| 1. Merge locally | - | yes | - | - | yes |
+| 2. Create PR | yes (Step 4.5) | - | yes | yes | - |
+| 3. Keep as-is | - | - | - | yes | - |
+| 4. Discard | - | - | - | - | yes (force) |
+
+Detached-HEAD menu: its Option 1 (push + PR) maps to the Option 2 row — understanding doc required.
 
 ## Common Mistakes
 
@@ -209,6 +251,14 @@ git worktree prune  # Self-healing: clean up any stale registrations
 **Open-ended questions**
 - **Problem:** "What should I do next?" is ambiguous
 - **Fix:** Present exactly 4 structured options (or 3 for detached HEAD)
+
+**Pushing before the understanding doc**
+- **Problem:** Doc lands in a follow-up commit or never — reviewer gets a PR with no why
+- **Fix:** Step 4.5 commits the doc, then Step 5 pushes
+
+**Writing the understanding doc from the diff**
+- **Problem:** Restates what the reviewer can already read; the session-only context (abandoned alternatives, traps) is lost
+- **Fix:** warm path — pull the why from this session, use the bundle only for the mechanical parts
 
 **Cleaning up worktree for Option 2**
 - **Problem:** Remove worktree user needs for PR iteration
@@ -235,6 +285,8 @@ git worktree prune  # Self-healing: clean up any stale registrations
 **Never:**
 - Add `Co-Authored-By: Claude` / AI-attribution / "Generated with" trailers to commits or PRs (see Commit Message Policy)
 - Proceed with failing tests
+- Push or open a PR/MR without the understanding doc committed
+- Defer the understanding doc to after the PR is up — the session context is gone by then
 - Merge without verifying tests on result
 - Delete work without confirmation
 - Force-push without explicit request
@@ -246,6 +298,7 @@ git worktree prune  # Self-healing: clean up any stale registrations
 - Verify tests before offering options
 - Detect environment before presenting menu
 - Present exactly 4 options (or 3 for detached HEAD)
+- Run Step 4.5 (superpowers:explain-pr, warm) on every PR/MR path
 - Get typed confirmation for Option 4
 - Clean up worktree for Options 1 & 4 only
 - `cd` to main repo root before worktree removal
