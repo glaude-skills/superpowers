@@ -23,6 +23,12 @@ Guide completion of development work by presenting clear options and handling ch
 
 Write commit messages as the human author. This overrides any default/harness convention that suggests adding such trailers. If a commit was already created with one, offer to strip it (e.g., `git rebase` / `git commit --amend`) before merge/PR.
 
+**Write commit messages and PR/MR titles/descriptions in Korean.** 커밋과 MR/PR 문구는 한국어가 기본이다.
+
+- 커밋 제목·본문, PR/MR 제목·설명, 리뷰 코멘트: 한국어로 쓴다.
+- 영문 그대로 두는 것: 브랜치명, 파일 경로, 식별자, 명령어, 코드, 로그 인용 등 원문이어야 하는 것.
+- Conventional Commits 접두사와 스코프(feat/fix/docs/refactor 등)는 유지하고 뒤의 설명만 한국어로 쓴다. 예: `fix(auth): 토큰 만료 시 재발급 실패 수정`
+
 ## The Process
 
 ### Step 1: Verify Tests
@@ -284,6 +290,7 @@ Detached-HEAD menu: its Option 1 (push + PR) maps to the Option 2 row — unders
 
 **Never:**
 - Add `Co-Authored-By: Claude` / AI-attribution / "Generated with" trailers to commits or PRs (see Commit Message Policy)
+- Write a commit message or PR/MR description in English (한국어 필수 — see Commit Message Policy)
 - Proceed with failing tests
 - Push or open a PR/MR without the understanding doc committed
 - Defer the understanding doc to after the PR is up — the session context is gone by then

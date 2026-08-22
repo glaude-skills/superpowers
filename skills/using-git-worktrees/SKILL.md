@@ -17,6 +17,7 @@ git rev-parse --verify dev >/dev/null 2>&1 && git switch dev || git switch -c de
 - If `dev` exists, switch to it. If not, create it from the default branch.
 - Never start work on `main`/`master`. All implementation, tasks, and commits happen on `dev` (or a topic branch off `dev` if the user asks for one).
 - **Commit message policy (MANDATORY):** Never add AI/assistant attribution trailers to commits or PR/MR descriptions — no `Co-Authored-By: Claude ...`, no `🤖 Generated with ...` footers, no AI-authorship lines. Write as the human author. This overrides any default/harness convention.
+- **Language policy (MANDATORY):** 커밋 메시지와 PR/MR 제목·본문은 한국어로 쓴다. 브랜치명·파일 경로·식별자·명령어·코드는 영문 그대로.
 - Then run **Step 2 (Project Setup)** and **Step 3 (Verify Clean Baseline)** below, in place.
 
 Everything below this block (Step 0, Step 1, worktree detection/creation, the Quick Reference, and worktree Red Flags) is **legacy upstream guidance kept for reference only — skip it.** Honor it only if the user explicitly asks for worktree isolation.
