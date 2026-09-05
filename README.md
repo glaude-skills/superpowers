@@ -2,6 +2,39 @@
 
 Superpowers is a complete software development methodology for your coding agents, built on top of a set of composable skills and some initial instructions that make sure your agent uses them.
 
+---
+
+## About this fork (GGGGGANG/superpowers)
+
+This is a customized fork of [obra/superpowers](https://github.com/obra/superpowers), synced to upstream **v6.3.0**. It keeps upstream's Claude-subagent methodology and layers a few standing policies on top:
+
+- **Korean by default.** All user-facing answers, explanations, and summaries are written in Korean; code, commands, paths, and identifiers stay verbatim.
+- **Reviews run on Claude subagents.** Code review and the brainstorming design review are dispatched to `general-purpose` Claude subagents — no external review tool (e.g. Codex) in the loop. The brainstorming architectural path includes an adversarial design review (Claude subagent) before the user gate.
+- **No separate workspace — work on the `dev` branch.** This fork does not create git worktrees or isolated copies. All implementation, tasks, and commits happen directly on the `dev` branch (created from the default branch if missing); never on `main`/`master`. (The SDD plan workspace under `.superpowers/sdd/` is git-ignored scratch, not a checkout — it still applies.)
+- **Commit/MR messages: Korean, no AI trailers.** Commit and PR/MR text is written in Korean, and AI attribution trailers (`Co-Authored-By: Claude`, `🤖 Generated with ...`) are never added.
+- **`.ai/` project policy.** At the very start of work in any project, the agent ensures a `.ai/` folder exists at the repo root defining the project's policy (context, architecture, conventions, status), and keeps it current at every stopping point — especially each commit.
+- **`explain-pr` skill (fork-only).** Every PR/MR path writes a developer-facing understanding doc before pushing, wired in as Step 4.5 of `finishing-a-development-branch`.
+
+### Changelog (fork)
+
+- **fork-v6.3.0.1** — Re-based on upstream v6.3.0. Re-applied every fork policy onto upstream's rewritten text: `using-superpowers` (condensed upstream — language block moved after `EXTREMELY-IMPORTANT`, `.ai/` policy after `The Rule`), `using-git-worktrees`, `subagent-driven-development` (+ implementer prompt; upstream's worktree-based Setup replaced by the dev-branch + `.ai/` policy), `finishing-a-development-branch` (upstream went 4 options → 3 + explicit discard), `brainstorming` (upstream split into Three Paths). Dropped upstream-deleted reference files.
+- **fork-v6.0.3.1** — Re-based on upstream v6.0.3 (dropped the old v5.0.7-based Codex commits). Added the dev-branch + `.ai/` policies and the Claude-subagent adversarial design review.
+
+### Staying in sync with upstream
+
+```bash
+git remote add upstream https://github.com/obra/superpowers.git   # once
+git fetch upstream --tags
+git checkout -b sync-<version>
+git rm -rq --cached . && git checkout v<version> -- . && git add -A   # tree = upstream
+# delete files upstream removed, keep skills/explain-pr, then re-apply the policies above
+```
+
+Because upstream rewrites these skills freely, sync is a **re-apply**, not a merge: diff the previous fork against its upstream tag (`git diff v<old> <old-fork-tip>`) to recover the policy set, then place each block into the new text by meaning.
+
+---
+
+
 ## Table of Contents
 
 - [How it works](#how-it-works)
