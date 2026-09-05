@@ -35,11 +35,19 @@ Subagent (general-purpose):
     1. Implement exactly what the task specifies
     2. Write tests (following TDD if task says to)
     3. Verify implementation works
-    4. Commit your work
-    5. Self-review (see below)
-    6. Report back
+    4. Update the project's `.ai/` policy files affected by this change
+       (architecture, conventions, status) so they stay current
+    5. Commit your work (code + matching `.ai/` updates in the same commit)
+    6. Self-review (see below)
+    7. Report back
 
     Work from: [directory]
+
+    Work on the `dev` branch in place. Do NOT create a worktree or separate
+    workspace, and never commit to `main`/`master`.
+
+    커밋 메시지는 한국어로 쓰고, AI 작성 트레일러(`Co-Authored-By: Claude`,
+    `🤖 Generated with ...` 등)는 절대 넣지 않는다.
 
     **While you work:** If you encounter something unexpected or unclear, **ask questions**.
     It's always OK to pause and clarify. Don't guess or make assumptions.

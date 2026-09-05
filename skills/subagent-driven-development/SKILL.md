@@ -83,14 +83,14 @@ digraph process {
         "Append completion to ledger, mark todo complete" [shape=box];
     }
 
-    "Setup: worktree, ledger check, read plan, pre-flight review" [shape=box];
+    "Setup: dev branch, ledger check, read plan, pre-flight review" [shape=box];
     "More tasks remain?" [shape=diamond];
     "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" [shape=box];
     "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" [shape=box];
     "Final review clean: delete this plan's workspace" [shape=box];
     "Use superpowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
 
-    "Setup: worktree, ledger check, read plan, pre-flight review" -> "Dispatch implementer subagent (./implementer-prompt.md)";
+    "Setup: dev branch, ledger check, read plan, pre-flight review" -> "Dispatch implementer subagent (./implementer-prompt.md)";
     "Dispatch implementer subagent (./implementer-prompt.md)" -> "Implementer asks questions?";
     "Implementer asks questions?" -> "Answer questions, provide context" [label="yes"];
     "Answer questions, provide context" -> "Implementer implements, tests, commits, self-reviews";
@@ -123,10 +123,17 @@ digraph process {
 
 ## Setup
 
-Ensure the work happens in an isolated workspace: use
-superpowers:using-git-worktrees to create one or verify the existing one.
-Never start implementation on a main/master branch without your human
-partner's explicit consent.
+**Fork policy — no separate workspace.** Work directly on the `dev` branch:
+invoke superpowers:using-git-worktrees for its FORK-POLICY block (branch
+switch, then project setup and a clean baseline in place). Do NOT create a git
+worktree or an isolated copy of the repo, and never run implementation on
+`main`/`master`. The plan workspace below is a git-ignored scratch directory,
+not a separate checkout — it still applies.
+
+**`.ai/` project policy.** Ensure the repo root has a `.ai/` folder defining
+the project's policy (context, architecture, conventions, status). If it is
+missing, create it before Task 1. Tell each implementer subagent to keep the
+relevant `.ai/` files current in the same commit as their code change.
 
 Conversation memory does not survive compaction. In real sessions,
 controllers that lost their place have re-dispatched entire completed task
@@ -499,13 +506,15 @@ Use superpowers:finishing-a-development-branch.
 | "Reviews slow the loop down" | The loop without reviews is just unverified churn. Reviews are the loop's brakes and steering. |
 | "Ledger bookkeeping is overhead" | The ledger is what survives compaction. Controllers without one have re-dispatched entire completed task sequences. |
 | "The implementer spawned its own reviewer — free extra assurance" | It's a duplicate seat reviewing the same diff; the task review is the gate. A worker-spawned reviewer is a defect to flag, not rigor. |
+| "main/master is fine just this once" | Fork policy: implementation runs on `dev`. A worktree or separate workspace only when your human partner asks for one. |
+| "I'll update `.ai/` later, in one pass" | A commit touching routes, data model, conventions, or progress without its `.ai/` update is incomplete. Same commit, every time. |
 
 ## Example Workflow
 
 ```
 You: I'm using Subagent-Driven Development to execute this plan.
 
-[Setup: worktree verified]
+[Setup: dev branch verified]
 [Read plan file once: docs/superpowers/plans/feature-plan.md]
 [Resolve workspace: scripts/sdd-workspace docs/superpowers/plans/feature-plan.md — no ledger inside, fresh start]
 [Create todos for all tasks]
