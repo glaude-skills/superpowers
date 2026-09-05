@@ -92,15 +92,16 @@ your path and complete them in order.
 5. **Implement** — proceed with the normal development workflow (TDD applies); no plan document
 
 **Architectural:**
-1. **Explore project context** — check files, docs, recent commits
+1. **Explore project context** — check files, docs, recent commits, and the project's `.ai/` policy folder (create `.ai/` if the project root lacks one — see using-superpowers)
 2. **Offer the visual companion just-in-time** — NOT upfront. The first time a question would genuinely be clearer shown than described, offer it then (its own message); on approval its browser tab opens for you. If no visual question ever arises, never offer it. See the Visual Companion section below.
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
 6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
 7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-8. **User reviews written spec** — ask user to review the spec file before proceeding
-9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+8. **Adversarial design review (Claude subagent)** — dispatch a fresh `general-purpose` subagent with [spec-document-reviewer-prompt.md](spec-document-reviewer-prompt.md) to challenge the design before the user gate; fix the findings inline (see below)
+9. **User reviews written spec** — ask user to review the spec file before proceeding
+10. **Transition to implementation** — invoke writing-plans skill to create implementation plan
 
 ## Process Flow
 
@@ -120,6 +121,7 @@ digraph brainstorming {
     "User approves design?" [shape=diamond];
     "Write design doc" [shape=box];
     "Spec self-review\n(fix inline)" [shape=box];
+    "Adversarial design review\n(Claude subagent, fix inline)" [shape=box];
     "User reviews spec?" [shape=diamond];
     "Invoke writing-plans skill" [shape=doublecircle];
     "Hidden complexity? Upgrade path" [shape=box];
@@ -140,7 +142,8 @@ digraph brainstorming {
     "User approves design?" -> "Present design sections" [label="no, revise"];
     "User approves design?" -> "Write design doc" [label="yes"];
     "Write design doc" -> "Spec self-review\n(fix inline)";
-    "Spec self-review\n(fix inline)" -> "User reviews spec?";
+    "Spec self-review\n(fix inline)" -> "Adversarial design review\n(Claude subagent, fix inline)";
+    "Adversarial design review\n(Claude subagent, fix inline)" -> "User reviews spec?";
     "User reviews spec?" -> "Write design doc" [label="changes requested"];
     "User reviews spec?" -> "Invoke writing-plans skill" [label="approved"];
 }
@@ -218,12 +221,17 @@ After writing the spec document, look at it with fresh eyes:
 
 Fix any issues inline. No need to re-review — just fix and move on.
 
-**User Review Gate:**
-After the spec review loop passes, ask the user to review the written spec before proceeding:
+**Adversarial Design Review (Claude subagent):**
+After your own self-review, get an independent set of eyes before bringing the spec to the user. Dispatch a fresh `general-purpose` (Claude) subagent using [spec-document-reviewer-prompt.md](spec-document-reviewer-prompt.md), pointed at the committed spec file. The subagent gets only the spec path — never your conversation history — so it challenges the design on its own merits (completeness, consistency, ambiguity, scope, YAGNI).
 
-> "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
+Triage its findings and fix the real ones inline, then commit. Design flaws are cheapest to fix here, before any implementation. If a finding is wrong, note why and move on — you adjudicate.
 
-Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
+**User Review Gate (HARD GATE):**
+After the adversarial review and your fixes, ask the user to review the written spec before proceeding:
+
+> "Spec written and committed to `<path>`. A Claude design reviewer flagged: <one-line summary of findings and how you resolved them>. Please review the spec and confirm before we move to the implementation plan."
+
+This is a hard gate. Wait for the user's **explicit** confirmation — do not proceed on silence or a vague reply. If they request changes, make them and re-run the self-review + adversarial review loop. Only invoke writing-plans once the user explicitly approves.
 
 **Implementation:**
 
