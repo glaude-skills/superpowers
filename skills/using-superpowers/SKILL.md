@@ -15,6 +15,10 @@ IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
 This is not negotiable. You cannot rationalize your way out of this.
 </EXTREMELY-IMPORTANT>
 
+## 언어 (Language)
+
+**항상 한국어로 응답하세요.** 사용자가 명시적으로 다른 언어를 요청하지 않는 한, 사용자에게 보여지는 모든 답변·설명·요약은 한국어로 작성합니다. (코드, 명령어, 파일 경로, 식별자 등 원문 그대로여야 하는 것은 예외입니다.)
+
 ## The Rule
 
 **Invoke relevant or requested skills BEFORE any response or action** — including clarifying questions, exploring the codebase, or checking files. If it turns out wrong for the situation, you don't have to use it.
@@ -22,6 +26,23 @@ This is not negotiable. You cannot rationalize your way out of this.
 **Before entering plan mode:** if you haven't already brainstormed, invoke the brainstorming skill first.
 
 Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it has a checklist, create a todo per item.
+
+## Project Policy (`.ai/`) — Standing Rule
+
+**At the very start of work in any project, before any other skill, ensure the project root has a `.ai/` folder that defines the project's policy.**
+
+1. **Bootstrap on first contact.** If `.ai/` does not exist at the repo root, create it and organize it into subfolders before doing other work. A typical layout:
+   - `.ai/CLAUDE.md` — one-page project context loaded each session
+   - `.ai/architecture/` — IA, data model, routes
+   - `.ai/convention/` — code, design, naming rules
+   - `.ai/domain/` — domain rules and definitions
+   - `.ai/status/` — current progress (STATUS, TASKS)
+
+   Scale the structure to the project — a tiny project may need only `.ai/CLAUDE.md` and `.ai/status/STATUS.md`. The point is that the project's policy lives in `.ai/`, not in your head.
+
+2. **Keep it current at every stopping point — especially at each commit.** Whenever a unit of work ends (a commit, a finished task, a merged branch), update the relevant `.ai/` files in the same change so the policy and status never drift from the code. A commit that changes routes, data model, conventions, or progress without updating `.ai/` is incomplete.
+
+This rule is a standing project convention. A project's own `.ai/` (or CLAUDE.md/AGENTS.md) may extend or override the layout, but never skip having one.
 
 ## Skill Priority
 
