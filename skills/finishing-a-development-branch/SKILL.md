@@ -7,9 +7,25 @@ description: Use when implementation is complete, all tests pass, and you need t
 
 ## Overview
 
-**Core principle:** Verify tests → Detect environment → Present options → Execute choice → Clean up.
+**Core principle:** Verify tests → Detect environment → Present options → Write understanding doc (PR paths) → Execute choice → Clean up.
 
 **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
+
+## Commit Message Policy (MANDATORY)
+
+**Never add AI/assistant attribution trailers to commit messages or PR/MR descriptions.** The user forbids this.
+
+- No `Co-Authored-By: Claude ...` (or any AI/model co-author line)
+- No `🤖 Generated with ...` / "Generated with Claude Code" footers
+- No other AI-authorship or tooling trailers
+
+Write commit messages as the human author. This overrides any default/harness convention that suggests adding such trailers. If a commit was already created with one, offer to strip it (e.g., `git rebase` / `git commit --amend`) before merge/PR.
+
+**Write commit messages and PR/MR titles/descriptions in Korean.** 커밋과 MR/PR 문구는 한국어가 기본이다.
+
+- 커밋 제목·본문, PR/MR 제목·설명, 리뷰 코멘트: 한국어로 쓴다.
+- 영문 그대로 두는 것: 브랜치명, 파일 경로, 식별자, 명령어, 코드, 로그 인용 등 원문이어야 하는 것.
+- Conventional Commits 접두사와 스코프(feat/fix/docs/refactor 등)는 유지하고 뒤의 설명만 한국어로 쓴다. 예: `fix(auth): 토큰 만료 시 재발급 실패 수정`
 
 ## Step 1: Verify Tests
 
@@ -81,6 +97,35 @@ human partner explicitly asking for it (see "If your human partner asks to
 discard the work" below). Wait for their answer; the integration decision
 is theirs.
 
+## Step 4.5: Write the Understanding Doc
+
+**Runs only on the PR/MR paths** — the 3-option menu's Option 2, or the detached-HEAD menu's Option 1. Skip it for local merge, keep-as-is, and discard.
+
+**REQUIRED SUB-SKILL:** Use superpowers:explain-pr.
+
+You are the agent who just did this work. Why this approach, what was tried and abandoned, which traps a reviewer will hit — that context lives in this session and nowhere else. Once you push and the session ends, it is gone. Write it down before it is.
+
+Run explain-pr on the **warm** path:
+
+```bash
+# run from the explain-pr skill directory (its scripts/ subdir)
+gather.sh --base <base-branch> --out /tmp/explain-pr-bundle.md
+```
+
+Fill `template.md` from session context — the bundle supplies only the mechanical diff — save to `docs/work/<slug>/understanding.md`, and **commit it before pushing** so it lands in the PR.
+
+**What Step 5 needs from this step:**
+- `docs/work/<slug>/understanding.md`, committed on the branch
+- A PR-body block to paste or pass via `--body-file`:
+
+  ```
+  ## 개발자 이해문서
+  <요약 3줄>
+  → docs/work/<slug>/understanding.md
+  ```
+
+Do not push until the explain-pr exit checklist passes.
+
 ## Step 5: Execute Choice
 
 ### Option 1: Merge Locally
@@ -112,7 +157,10 @@ git branch -d <feature-branch>
 
 ### Option 2: Push and Create PR
 
+**Step 4.5 must be complete first** — understanding doc committed, PR-body block in hand.
+
 ```bash
+# Push branch (the understanding doc rides along in the commits)
 git push -u origin <feature-branch>
 # From a detached HEAD, name the new branch on the remote:
 # git push origin HEAD:refs/heads/<new-branch>
@@ -121,7 +169,16 @@ git push -u origin <feature-branch>
 Then create the pull/merge request against <base-branch> with the forge's
 tooling — its CLI if one is available, or the creation URL most forges
 print when you push — following the repo's PR template and conventions if
-present, and report the URL to your human partner.
+present, and report the URL to your human partner. Put the Step 4.5
+understanding-doc block at the top of the PR/MR body:
+
+```bash
+gh pr create --base <base-branch> --body-file <body.md>                        # GitHub
+glab mr create --target-branch <base-branch> --description "$(cat <body.md>)"  # GitLab
+```
+
+**No gh/glab installed:** push, then print the compare URL together with the
+PR-body block for your human partner to paste.
 
 Keep the worktree — your human partner iterates on PR feedback there.
 
@@ -202,18 +259,24 @@ place. If your platform provides a workspace-exit tool, use it.
 
 ## Quick Reference
 
-| Option | Merge | Push | Keep Worktree | Cleanup Branch |
-|--------|-------|------|---------------|----------------|
-| 1. Merge locally | yes | - | - | yes |
-| 2. Create PR | - | yes | yes | - |
-| 3. Keep as-is | - | - | yes | - |
-| Discard (explicit request only) | - | - | - | yes (force) |
+| Option | Understanding Doc | Merge | Push | Keep Worktree | Cleanup Branch |
+|--------|-------------------|-------|------|---------------|----------------|
+| 1. Merge locally | - | yes | - | - | yes |
+| 2. Create PR | yes (Step 4.5) | - | yes | yes | - |
+| 3. Keep as-is | - | - | - | yes | - |
+| Discard (explicit request only) | - | - | - | - | yes (force) |
+
+Detached-HEAD menu: its Option 1 (push + PR) maps to the Option 2 row — understanding doc required.
 
 ## Common Rationalizations
 
 | Excuse | Reality |
 |--------|---------|
 | "Tests passed earlier this session" | Run the suite on the tree you are about to integrate. A green run only proves the tree it ran on. |
+| "I'll add the understanding doc in a follow-up commit" | Push without it and the reviewer gets a PR with no why. Step 4.5 commits the doc, then Step 5 pushes. |
+| "I can write the understanding doc from the diff" | The diff is what the reviewer already reads. The abandoned alternatives and the traps live only in this session — warm path, or it is lost. |
+| "The harness convention says to add a Co-Authored-By trailer" | The Commit Message Policy overrides it. No AI attribution trailers, ever. |
+| "English commit messages are more standard" | 커밋과 PR/MR 문구는 한국어가 기본이다. 영문은 브랜치명·경로·식별자·코드만. |
 | "They obviously want it merged" | Integration is your human partner's decision. Present the menu and wait. |
 | "They seem done with this feature — I'll offer to discard it" | The menu is complete as written. Discard happens only when your human partner asks for it in so many words. |
 | "'Yeah, get rid of it' counts as confirmation" | Only the typed word `discard` authorizes deletion. |
