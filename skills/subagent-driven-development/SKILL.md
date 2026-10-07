@@ -458,7 +458,10 @@ on the most capable available model (see Model Selection), using
 superpowers:requesting-code-review's
 [code-reviewer.md](../requesting-code-review/code-reviewer.md). Point it at
 the ledger's deferred-minor and parked lines so it can triage which must be
-fixed before merge.
+fixed before merge. If the branch has a contract to keep, dispatch
+[contract-reviewer.md](../requesting-code-review/contract-reviewer.md) in
+parallel with it and settle disagreements by superpowers:requesting-code-review's
+"Two Seats" rules; its findings join the same single fix wave.
 
 If the final whole-branch review returns findings, dispatch ONE fix subagent
 with the complete findings list — not one fixer per finding.

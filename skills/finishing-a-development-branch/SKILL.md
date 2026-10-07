@@ -233,6 +233,12 @@ sync again right before merge.
 
 Keep the worktree — your human partner iterates on PR feedback there.
 
+**Ask for process feedback once.** After reporting the PR URL, ask one question: was anything in
+this run awkward, or something they had to correct more than once? No answer or "no" → stop;
+never ask again in this run. If there is feedback, **register it as follow-up work only** — a
+`docs/tech-debt/` item or an issue naming which skill, agent, or project rule it should change.
+Do not fold it into this PR: the DoD was frozen, and changing scope here bypasses that freeze.
+
 ### Option 3: Keep As-Is
 
 Report: "Keeping branch <name>. Worktree preserved at <path>."
