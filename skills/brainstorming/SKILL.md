@@ -11,13 +11,75 @@ Start by classifying how much process the request needs, then work
 through your path: understand the context, refine the idea, present a
 design, and get your human partner's approval.
 
+## Establish Shared Understanding
+
+The outcome of brainstorming is an understanding your human partner can
+recognize and correct, grounded in what they want to accomplish.
+
+1. **Discover intent.** Use the request and available context to identify
+   the intended outcome, who it is for, and what success looks like. When
+   that information is missing, ask one focused question about purpose or
+   intended use before proposing features or an approach. Knowing the app
+   genre does not tell you why your partner wants it. Gathering missing
+   requirements does not ask them to authorize the task again.
+2. **Write back your understanding.** Summarize the intended outcome,
+   relevant constraints, and success criteria in a short note your partner
+   can assess. Separate what they said from assumptions. Invite correction
+   and incorporate their answer before treating this as the design brief.
+3. **Carry intent into the design.** Preserve the agreed understanding in
+   the selected path's design artifact: the written spec for architectural
+   work, or the in-chat design/probe for bounded work and spikes. Check
+   proposed features and technical choices against that understanding.
+
+When the request already supplies the purpose and constraints, reflect
+that understanding instead of asking the same questions again. Keep the
+note concise; its accuracy and the opportunity to correct it matter.
+
 <HARD-GATE>
-Do NOT invoke any implementation skill, write any code, scaffold any
-project, or take any implementation action until you have told your
-human partner what you intend and they have approved it. This applies
-to EVERY task on EVERY path below — the ceremony scales with the task;
-the approval gate never does.
+Before taking any implementation action, including invoking an
+implementation skill, writing product code, scaffolding, installing
+product dependencies, or creating an external project, complete the
+selected path's prerequisites:
+
+- Spike: the human partner approves the question and probe.
+- Bounded: the human partner approves the short in-chat design.
+- Architectural: the human partner reviews and approves the written spec,
+  then reviews the written implementation plan and selects its execution
+  method. Conversational design approval only permits writing the spec;
+  written-spec approval only permits invoking writing-plans.
+
+A reply approves the stage actually presented. Approval of an idea or
+feature scope does not approve artifacts that do not exist yet. Resume
+at the earliest incomplete stage; do not turn one approval into permission
+to skip the rest of the selected path. Read-only project exploration is
+allowed while those prerequisites remain incomplete.
 </HARD-GATE>
+
+## Re-entry Check (read-only, before anything is written)
+
+Before classifying, look for this topic's work directory, `docs/work/<slug>/`
+(`<slug>` is the branch slug). Only read — `ls` and `cat`. Two axes decide:
+does the directory exist, and is the request inside the scope already agreed?
+
+| Observed | Verdict | Entry point |
+|---|---|---|
+| No directory for this topic | **Initial run** | Classify the path below and start fresh |
+| Directory exists, request inside the agreed scope, your partner points at nothing specific | **Follow-up** | Return to the existing branch/worktree and resume at the interrupted stage. A FROZEN `dod.md` with unfinished implementation belongs here: keep the contract, continue the code. Nothing interrupted → say so and stop |
+| Directory exists, request inside the scope, your partner points at a specific artifact or part | **Partial rerun** | Resume at the stage that owns it — this wins over Follow-up — then finish any remaining interrupted stages |
+| Directory exists, request outside the agreed scope (usually `dod.md` is FROZEN or has a verdict) | **New run** | New slug, new branch, start fresh. The old artifacts stay in git history — do not move them |
+
+- **Scope means what was approved:** the approved spec or the frozen DoD. Work interrupted before
+  approval has no fixed scope yet — absorb new details where you resume instead of calling them
+  out of scope. A Bounded or Spike run that never wrote those documents takes its original request
+  as the scope.
+- **Decide by the two axes, not by words** like "update", "fix", or "again". The same "fix" can be
+  a Partial rerun or a New run.
+- **Several requests in one message:** split them and judge each. Out-of-scope units go to a new
+  slug; in-scope ones stay on the existing branch. If two out-of-scope units touch the same files,
+  propose bundling them and let your partner decide. Units whose files overlap run one after
+  another, never in parallel.
+- **Why this comes before workspace isolation:** a Follow-up must reuse the existing worktree. Check
+  first, or you create a second branch whose tree diverges from the one holding the work.
 
 ## Three Paths
 
@@ -53,18 +115,17 @@ stop, say so, and step up. Nothing downgrades mid-task.
 
 ## Anti-Pattern: "Too Simple To Need Approval"
 
-Every path ends with your human partner approving your intent before
-implementation. A todo list, a single-function utility, a config
-change — the design may be two sentences in chat, but you MUST present
-it and get approval. "Simple" tasks are where unexamined assumptions
-cause the most wasted work. What scales with simplicity is the
-artifact, never the approval.
+Every path ends with your human partner approving the required design
+before implementation. A bounded change may need only two sentences in
+chat. A new todo-list project is architectural and requires the written
+spec and planning handoffs. Scale the artifact to the selected path;
+complete that path's reviews before implementation.
 
 ## Red Flags
 
 | Thought | Reality |
 |---------|---------|
-| "This is too simple to need a design" | Simple means a short design, not no design. Two sentences in chat, then approval. |
+| "This is too simple to need a design" | Follow the selected path: a bounded change gets a short chat design; an architectural change gets the written spec and planning handoffs. |
 | "I'll call it bounded and skip the spec" | Reaching for a label to skip work IS the doubt — take the heavier path. |
 | "It's bounded and the design is obvious — I'll start while they read it" | The gate is the approval, not the design's length. Present, then stop until you hear yes. |
 | "I understand this kind of app, so it's bounded" | Bounded measures the repo, not your familiarity. A new project has no existing flow — it is architectural. |
@@ -97,7 +158,7 @@ your path and complete them in order.
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
+6. **Write design doc** — save to `docs/work/<slug>/design.md` (`<slug>` = branch slug; the plan, DoD, and understanding doc join it there) and commit
 7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 8. **Adversarial design review (Claude subagent)** — dispatch a fresh `general-purpose` subagent with [spec-document-reviewer-prompt.md](spec-document-reviewer-prompt.md) to challenge the design before the user gate; fix the findings inline (see below)
 9. **User reviews written spec** — ask user to review the spec file before proceeding
@@ -206,7 +267,7 @@ is the whole process.
 
 **Documentation:**
 
-- Write the validated design (spec) to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
+- Write the validated design (spec) to `docs/work/<slug>/design.md`
   - (User preferences for spec location override this default)
 - Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git

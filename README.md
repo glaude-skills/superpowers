@@ -4,19 +4,25 @@ Superpowers is a complete software development methodology for your coding agent
 
 ---
 
-## About this fork (GGGGGANG/superpowers)
+## About this fork (glaude-skills/superpowers)
 
-This is a customized fork of [obra/superpowers](https://github.com/obra/superpowers), synced to upstream **v6.3.0**. It keeps upstream's Claude-subagent methodology and layers a few standing policies on top:
+This is a customized fork of [obra/superpowers](https://github.com/obra/superpowers), synced to upstream **v6.4.2**. It keeps upstream's Claude-subagent methodology and layers a few standing policies on top:
 
 - **Korean by default.** All user-facing answers, explanations, and summaries are written in Korean; code, commands, paths, and identifiers stay verbatim.
 - **Reviews run on Claude subagents.** Code review and the brainstorming design review are dispatched to `general-purpose` Claude subagents — no external review tool (e.g. Codex) in the loop. The brainstorming architectural path includes an adversarial design review (Claude subagent) before the user gate.
-- **No separate workspace — work on the `dev` branch.** This fork does not create git worktrees or isolated copies. All implementation, tasks, and commits happen directly on the `dev` branch (created from the default branch if missing); never on `main`/`master`. (The SDD plan workspace under `.superpowers/sdd/` is git-ignored scratch, not a checkout — it still applies.)
 - **Commit/MR messages: Korean, no AI trailers.** Commit and PR/MR text is written in Korean, and AI attribution trailers (`Co-Authored-By: Claude`, `🤖 Generated with ...`) are never added.
 - **`.ai/` project policy.** At the very start of work in any project, the agent ensures a `.ai/` folder exists at the repo root defining the project's policy (context, architecture, conventions, status), and keeps it current at every stopping point — especially each commit.
-- **`explain-pr` skill (fork-only).** Every PR/MR path writes a developer-facing understanding doc before pushing, wired in as Step 4.5 of `finishing-a-development-branch`.
+- **One work directory per feature.** Spec, plan, DoD, and understanding doc live together in `docs/work/<slug>/` (`<slug>` = branch slug). Brainstorming starts with a read-only re-entry check of that directory: initial run, follow-up, partial rerun, or new run.
+- **`definition-of-done` skill (fork-only).** writing-plans drafts `dod.md` (criteria with verification tiers T1–T4 and named verification commands), commits design/plan/DoD as a draft, and freezes the DoD in its own commit when the plan is approved. Execution ends with a fixed-format DoD verdict (`VERIFIED` / `AWAITING_HUMAN` / `FAILED` / `BLOCKED`).
+- **Claims about existing code are checked.** The spec reviewer and the plan self-review open the code behind every claim about existing behavior.
+- **Sync with the base before the PR.** `finishing-a-development-branch` merges `origin/<base>` (merge, not rebase) and re-runs the full suite before pushing, then checks mergeability. PR bodies carry measured numbers and keep unverified items unchecked.
+- **One file per item.** Tech debt (`docs/tech-debt/<summary>.md`) and change history (`docs/changelog/YYYY-MM-DD-<slug>.md`) never go into a shared list file.
+- **`explain-pr` skill (fork-only).** Every PR/MR path writes a developer-facing understanding doc before pushing, wired in as Step 4.5 of `finishing-a-development-branch` and linked from the PR body by a commit-SHA permalink.
 
 ### Changelog (fork)
 
+- **fork-v6.4.2.2** — Folded in the generic parts of the Jeju (aic-api) harness: `definition-of-done` skill with draft/freeze commits, `docs/work/<slug>/` as the single artifact location, the brainstorming re-entry check, the existing-code claims check (spec reviewer + plan self-review), base sync before the PR, PR-body rules, one-file-per-item tech debt and changelog, and SHA permalinks in `explain-pr`.
+- **fork-v6.4.2.1** — Merged upstream v6.4.2 as a real merge commit (upstream as second parent), so future syncs get the correct merge-base. Dropped the dev-branch / no-worktree policy: workspace isolation now follows upstream `using-git-worktrees` again. Carried the `.ai/` policy into upstream's rewritten `executing-plans` Setup.
 - **fork-v6.3.0.1** — Re-based on upstream v6.3.0. Re-applied every fork policy onto upstream's rewritten text: `using-superpowers` (condensed upstream — language block moved after `EXTREMELY-IMPORTANT`, `.ai/` policy after `The Rule`), `using-git-worktrees`, `subagent-driven-development` (+ implementer prompt; upstream's worktree-based Setup replaced by the dev-branch + `.ai/` policy), `finishing-a-development-branch` (upstream went 4 options → 3 + explicit discard), `brainstorming` (upstream split into Three Paths). Dropped upstream-deleted reference files.
 - **fork-v6.0.3.1** — Re-based on upstream v6.0.3 (dropped the old v5.0.7-based Codex commits). Added the dev-branch + `.ai/` policies and the Claude-subagent adversarial design review.
 
@@ -25,12 +31,12 @@ This is a customized fork of [obra/superpowers](https://github.com/obra/superpow
 ```bash
 git remote add upstream https://github.com/obra/superpowers.git   # once
 git fetch upstream --tags
-git checkout -b sync-<version>
-git rm -rq --cached . && git checkout v<version> -- . && git add -A   # tree = upstream
-# delete files upstream removed, keep skills/explain-pr, then re-apply the policies above
+git switch -c sync-<version> main
+git merge v<version>           # merge-base is the last synced upstream release
+# resolve conflicts by keeping the policies above, then run tests/
 ```
 
-Because upstream rewrites these skills freely, sync is a **re-apply**, not a merge: diff the previous fork against its upstream tag (`git diff v<old> <old-fork-tip>`) to recover the policy set, then place each block into the new text by meaning.
+Since fork-v6.4.2.1 the last synced upstream release is a real parent of `main`, so sync is an ordinary merge. Check the policy set with `git diff v<version> HEAD` — it should show only the fork's files.
 
 ---
 
@@ -53,8 +59,11 @@ Because upstream rewrites these skills freely, sync is a **re-apply**, not a mer
   - [Kimi Code](#kimi-code)
   - [OpenCode](#opencode)
   - [Pi](#pi)
+  - [Qwen Code](#qwen-code)
   - [Hermes Agent](#hermes-agent)
+  - [Muse](#muse)
 - [The Basic Workflow](#the-basic-workflow)
+- [When Something Goes Wrong](#when-something-goes-wrong)
 - [Community](#community)
 - [What's Inside](#whats-inside)
 - [Philosophy](#philosophy)
@@ -279,6 +288,22 @@ pi -e /path/to/superpowers
 
 The Pi package loads the Superpowers skills and a small extension that injects the `using-superpowers` bootstrap at session startup and again after compaction. Pi has native skills, so no compatibility `Skill` tool is required. Subagent and task-list tools remain optional Pi companion packages.
 
+### Qwen Code
+
+Qwen Code installs plugins from Claude Code marketplaces directly.
+
+- Install the plugin from this repository, and pick `superpowers` when prompted:
+
+  ```bash
+  qwen extensions install obra/superpowers
+  ```
+
+- Update later:
+
+  ```bash
+  qwen extensions update superpowers
+  ```
+
 ### Hermes Agent
 
 Install Superpowers as a Hermes plugin from this repository:
@@ -291,6 +316,33 @@ Restart any active Hermes sessions after installing. Note: Hermes has no
 post-compaction hook, so a very long session that compacts over its first
 turn loses the bootstrap — start a fresh session if skills stop triggering.
 
+### Muse
+
+Superpowers is available as a native Muse plugin — same repo, same skills, all harnesses. The `using-superpowers` bootstrap is injected via the native `SessionStart` hook alongside Claude Code, Codex, Cursor, Gemini, Pi, and the rest — no per-session opt-in.
+
+- Install from a local checkout:
+
+  ```bash
+  muse plugins install ./
+  muse plugins approve superpowers
+  ```
+
+  Or clone and install:
+
+  ```bash
+  git clone https://github.com/obra/superpowers.git
+  muse plugins install ./superpowers
+  muse plugins approve superpowers
+  ```
+
+- Update later:
+
+  ```bash
+  muse plugins update superpowers
+  ```
+
+Restart any active Muse sessions after installing so the `SessionStart` hook takes effect — skills are active immediately, hooks require approval on first install. To verify, start a fresh session and send `Let's make a react todo list` — a working install auto-triggers `brainstorming` before any code is written. Version is tracked in `.version-bump.json` so `scripts/bump-version.sh` keeps it in sync.
+
 ## The Basic Workflow
 
 1. **brainstorming** - Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document.
@@ -299,7 +351,7 @@ turn loses the bootstrap — start a fresh session if skills stop triggering.
 
 3. **writing-plans** - Activates with approved design. Breaks work into bite-sized tasks (2-5 minutes each). Every task has exact file paths, complete code, verification steps.
 
-4. **subagent-driven-development** or **executing-plans** - Activates with plan. Dispatches fresh subagent per task with two-stage review (spec compliance, then code quality), or executes in batches with human checkpoints.
+4. **subagent-driven-development** or **executing-plans** - Activates with plan. Either dispatches a fresh subagent per task with a review after each (most thorough), or implements every task inline in the current session with one fresh review of the whole branch at the end (cheapest).
 
 5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR: write failing test, watch it fail, write minimal code, watch it pass, commit. Deletes code written before tests.
 
@@ -308,6 +360,12 @@ turn loses the bootstrap — start a fresh session if skills stop triggering.
 7. **finishing-a-development-branch** - Activates when tasks complete. Verifies tests, presents options (merge/PR/keep/discard), cleans up worktree.
 
 **The agent checks for relevant skills before any task.** Mandatory workflows, not suggestions.
+
+## When Something Goes Wrong
+
+Sometimes a session misbehaves: a skill fires when it shouldn't, stays silent when it should, or the agent ignores its plan, repeats work, or burns more tokens than you'd expect. Ask your coding agent to "figure out what went wrong with superpowers in this session" and it will invoke the **diagnosing-superpowers** skill. To examine an earlier session, name it: "figure out what went wrong with superpowers in session `<id>`".
+
+The skill reads the session transcript, reports what happened with line-level evidence, and, if you want, packages a scrubbed bundle for a bug report.
 
 ## Community
 
@@ -327,11 +385,12 @@ Superpowers is built by [Jesse Vincent](https://blog.fsck.com) and the rest of t
 **Debugging**
 - **systematic-debugging** - 4-phase root cause process (includes root-cause-tracing, defense-in-depth, condition-based-waiting techniques)
 - **verification-before-completion** - Ensure it's actually fixed
+- **diagnosing-superpowers** - Work out what went wrong in a session, with evidence; export a scrubbed bundle or file an issue
 
 **Collaboration** 
 - **brainstorming** - Socratic design refinement
 - **writing-plans** - Detailed implementation plans
-- **executing-plans** - Batch execution with checkpoints
+- **executing-plans** - Inline plan execution: one context, one final review
 - **dispatching-parallel-agents** - Concurrent subagent workflows
 - **requesting-code-review** - Pre-review checklist
 - **receiving-code-review** - Responding to feedback

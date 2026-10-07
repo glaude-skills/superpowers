@@ -43,9 +43,6 @@ Subagent (general-purpose):
 
     Work from: [directory]
 
-    Work on the `dev` branch in place. Do NOT create a worktree or separate
-    workspace, and never commit to `main`/`master`.
-
     커밋 메시지는 한국어로 쓰고, AI 작성 트레일러(`Co-Authored-By: Claude`,
     `🤖 Generated with ...` 등)는 절대 넣지 않는다.
 

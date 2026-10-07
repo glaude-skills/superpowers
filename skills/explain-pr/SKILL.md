@@ -33,15 +33,33 @@ base 미지정 시 스크립트가 자동 결정(인자 > PR target > dev > 기�
 
 ### 4. 저장 + PR 통합
 - 파일: `docs/work/<slug>/understanding.md`로 저장. `<slug>`는 브랜치 slug로 같은 기능의 spec/plan/dod와 동일 키다. PR 번호는 파일명이 아니라 문서 헤더와 PR 본문 링크에만 쓴다. (한 기능에 PR이 여럿이면 `understanding-PR<n>.md`로 폴백.)
-- 폴더 랜딩: `docs/work/<slug>/README.md`가 없거나 오래됐으면 한 줄 설명 + 존재하는 문서(design/plan/dod/understanding) 링크로 생성·갱신하고, 상위 `docs/work/README.md`의 작업 목록에 `[한글 제목](<slug>/README.md)` 행을 추가한다.
+- 폴더 랜딩: `docs/work/<slug>/README.md`가 없거나 오래됐으면 한 줄 설명 + 존재하는 문서(design/plan/dod/understanding) 링크로 생성·갱신한다. **상위 `docs/work/README.md` 같은 목록 파일에 행을 추가하지 않는다** — 모든 브랜치가 같은 자리를 고쳐 병렬 MR 충돌의 주범이 된다. 목록은 `ls docs/work/` 가 대신한다.
 - **문서를 커밋한다** — push 전에 커밋해야 PR에 포함된다.
-- PR/MR 본문: 상단에 아래 블록을 삽입한다.
+- PR/MR 본문: 상단에 아래 블록을 삽입한다. **링크는 호스트까지 포함한 절대 URL이다.**
 
   ```
   ## 개발자 이해문서
   <요약 3줄>
-  → docs/work/<slug>/understanding.md
+
+  📄 **[개발자 이해문서 전문 보기 →](<PERMALINK>)**
+  <sub>`docs/work/<slug>/understanding.md` · 커밋 고정 링크라 브랜치 삭제 후에도 열립니다</sub>
   ```
+
+  `<PERMALINK>`는 **브랜치명이 아니라 head 커밋 SHA**로 만든다. 브랜치 링크는 머지 후 브랜치가
+  지워지면 404가 된다. 경로 세그먼트는 호스트마다 다르다 — GitHub은 `/blob/`, GitLab은 `/-/blob/`.
+
+  ```bash
+  # 문서를 커밋한 뒤 실행한다 — SHA가 그 커밋을 가리켜야 한다
+  SHA=$(git rev-parse HEAD)
+  BASE=$(git remote get-url origin | sed -E 's#(git@|https://)([^:/]+)[:/]#https://\2/#; s#\.git$##')
+  case "$BASE" in *github.*) SEG="/blob" ;; *) SEG="/-/blob" ;; esac
+  echo "${BASE}${SEG}/${SHA}/docs/work/<slug>/understanding.md"
+  ```
+
+  - **상대 경로를 쓰지 않는다.** GitLab은 본문의 상대 링크 앞에 `<project>/-/blob/`을 붙여 다시 써서
+    `/-/blob/-/blob/...`처럼 겹치고, 저장소 상대 경로는 기본 브랜치를 가리켜 머지 전에는 404다.
+  - finishing의 base 동기화(병합 커밋)가 생기면 head SHA가 바뀐다. 문서가 그 커밋에도 그대로
+    있으므로 링크는 계속 열린다 — 다시 만들 필요는 없다.
 
   - finishing-a-development-branch Option 2 경로: `gh pr create` / `glab mr create` **전에** 본문에 포함.
   - 기존 PR: `gh pr edit <n> --body-file` / `glab mr update <n> --description` 로 주입.
@@ -54,6 +72,7 @@ base 미지정 시 스크립트가 자동 결정(인자 > PR target > dev > 기�
 - [ ] 미해결 TODO/TBD가 없다
 - [ ] cold 경로면 추정 부분에 `⚠️ 추정`이 표기됐다
 - [ ] 문서가 커밋됐다(warm 경로: push 전)
+- [ ] **PR/MR 본문의 이해문서 링크가 클릭 가능한 절대 URL이고, 브랜치명이 아닌 커밋 SHA를 쓴다**
 - [ ] 자문 통과: "이 PR 링크만 보고 개발자가 이해·재현 가능한가?"
 
 ## 비목표
