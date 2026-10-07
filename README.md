@@ -43,6 +43,15 @@ git merge v<version>           # merge-base is the last synced upstream release
 
 Since fork-v6.4.2.1 the last synced upstream release is a real parent of `main`, so sync is an ordinary merge. Check the policy set with `git diff v<version> HEAD` — it should show only the fork's files.
 
+### Versioning fork changes
+
+Claude Code decides whether `/plugin update` has anything to install by the plugin `version`. A fork change that keeps the version leaves every machine that already has that version on the old copy ("already at the latest version").
+
+- **Every fork change that should reach installed machines bumps the patch version** in `package.json`, `.claude-plugin/plugin.json`, and `.claude-plugin/marketplace.json` together (run `tests/version-bump/` checks if you touch the bump script).
+- **Never use a pre-release suffix** such as `6.4.2-fork.1`: semver orders it *below* `6.4.2`, so machines on `6.4.2` would never update.
+- **On an upstream sync**, set the version one patch above the larger of the fork's and upstream's — the number must only ever increase.
+- Record which upstream release the fork is based on in the changelog entry below (`fork-v<upstream>.<n>` labels).
+
 ---
 
 
