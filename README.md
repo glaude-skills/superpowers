@@ -4,7 +4,7 @@ Superpowers is a complete software development methodology for your coding agent
 
 ---
 
-## About this fork (GGGGGANG/superpowers)
+## About this fork (glaude-skills/superpowers)
 
 This is a customized fork of [obra/superpowers](https://github.com/obra/superpowers), synced to upstream **v6.4.2**. It keeps upstream's Claude-subagent methodology and layers a few standing policies on top:
 
