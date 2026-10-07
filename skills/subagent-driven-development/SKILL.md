@@ -56,6 +56,8 @@ digraph when_to_use {
 - Costs a fresh context per task and per review; inline costs one context plus one final reviewer
 - Both run in this session, share the same plan workspace and ledger, and never pause between tasks
 
+**Small plans run light.** When the plan has three or fewer tasks, or its tasks touch the same module one after another, do not dispatch an implementer and a task reviewer per task. Use one implementer for the whole plan (or executing-plans inline) and one final whole-branch review. Per-task review seats pay off when tasks are independent or risky. On a small plan they multiply dispatches without catching more (see using-superpowers, "Scale the Process to the Task").
+
 ## The Process
 
 ```dot

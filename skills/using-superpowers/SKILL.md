@@ -53,6 +53,20 @@ When multiple skills apply, process skills come first — they set the approach,
 - "Let's build X" → superpowers:brainstorming first, then implementation skills.
 - "Fix this bug" → superpowers:systematic-debugging first, then domain skills.
 
+## Scale the Process to the Task
+
+Using a skill does not mean running every stage at full weight. Before you start a heavyweight pipeline (a project orchestrator, subagent-driven-development, the architectural brainstorming path), judge the task's size and pick the path that matches it.
+
+| Size | Signals | Default path |
+|---|---|---|
+| Small | One endpoint, column, or flag added to a flow that already exists; roughly ≤600 changed lines; one module family | Bounded: short design in chat → approval → one or two implementer dispatches → one final review |
+| Medium / large | New domain, several apps, security, concurrency, data migration of existing records | Full pipeline |
+
+- For a small task, recommend the light path in **one** question at the start. Cite the project pipeline's own skip rules if it has them. Do not run the full pipeline without asking.
+- Keep a review on the risky parts only: migrations, auth, transaction boundaries.
+- Merge the base branch before you start, so number collisions (Flyway versions, ids) show up now instead of mid-review.
+- Real cost seen: one read endpoint plus one column (+594 lines) took about 20 subagent dispatches through the full pipeline. The partner said it should not have taken that long.
+
 ## Red Flags
 
 These thoughts mean STOP—you're rationalizing:
