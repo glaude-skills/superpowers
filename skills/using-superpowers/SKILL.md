@@ -42,6 +42,8 @@ Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it h
 
 2. **Keep it current at every stopping point — especially at each commit.** Whenever a unit of work ends (a commit, a finished task, a merged branch), update the relevant `.ai/` files in the same change so the policy and status never drift from the code. A commit that changes routes, data model, conventions, or progress without updating `.ai/` is incomplete.
 
+3. **Route, don't load everything.** Keep always-loaded context small. Rule documents that are not needed every session go in a routing table in the entry file (`.ai/CLAUDE.md` or the project's CLAUDE.md), one row each: **trigger** (a task or path pattern) | **document to read first** | **the one line you must not forget**. When the current work matches a trigger, read that document before writing code or docs, even if nobody asked. When dispatching an implementer or reviewer subagent, apply the table to the paths involved and pass it the resulting document list — subagents do not see the table.
+
 This rule is a standing project convention. A project's own `.ai/` (or CLAUDE.md/AGENTS.md) may extend or override the layout, but never skip having one.
 
 ## Skill Priority

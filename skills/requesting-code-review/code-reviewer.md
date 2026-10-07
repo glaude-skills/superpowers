@@ -120,13 +120,16 @@ Subagent (general-purpose):
     [Code style, optimization opportunities, documentation polish]
 
     For each issue:
-    - File:line reference
+    - File:line reference (prefix `[POSSIBLE]` when you are not sure it is real)
     - What's wrong
     - Why it matters
     - How to fix (if not obvious)
 
     ### Recommendations
     [Improvements for code quality, architecture, or process]
+
+    ### Not reviewed
+    [Changed files or areas you did not read, and why. Empty means you read the whole range.]
 
     ### Assessment
 

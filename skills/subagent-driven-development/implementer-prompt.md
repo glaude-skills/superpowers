@@ -121,6 +121,14 @@ Subagent (general-purpose):
 
     If you find issues during self-review, fix them now before reporting.
 
+    ## If This Task Already Has Work
+
+    You may be dispatched onto a task that already has commits or a report
+    file. Read them first. Change only what the findings or the brief point
+    at; do not rewrite the task — a rewrite silently undoes decisions an
+    earlier review agreed to and buries the real change in a large diff. If
+    you reverse an earlier decision, say what and why in the report.
+
     ## After Review Findings
 
     If the task review finds issues, you will be resumed with the findings.
@@ -141,6 +149,10 @@ Subagent (general-purpose):
     - Files changed
     - Self-review findings (if any)
     - Any issues or concerns
+    - **Assumptions and open decisions** — one line each, tagged:
+      `[ASSUMPTION]` where you filled a gap the task left open and kept going,
+      `[DECISION_NEEDED]` where more than one valid choice exists and you
+      need the controller to pick. Write `none` if there are none.
 
     Then report back with ONLY (under 15 lines — the detail lives in the
     report file):
@@ -148,6 +160,7 @@ Subagent (general-purpose):
     - Commits created (short SHA + subject)
     - One-line test summary (e.g. "14/14 passing, output pristine")
     - Your concerns, if any
+    - Count of `[ASSUMPTION]` and `[DECISION_NEEDED]` lines in the report
     - The report file path
 
     If BLOCKED or NEEDS_CONTEXT, put the specifics in the final message

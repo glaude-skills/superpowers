@@ -253,7 +253,10 @@ pointer to the ledger's `Ruling:` lines so it can weigh the calls you
 made. Specify the model
 explicitly; an omitted model inherits the session's, which may not be the
 most capable. This is the one fresh context the whole run buys. Do not
-skip it, and do not replace it with your own read of the diff.
+skip it, and do not replace it with your own read of the diff. If the branch has a contract to keep, dispatch
+[contract-reviewer.md](../requesting-code-review/contract-reviewer.md) in
+parallel with it and settle disagreements by superpowers:requesting-code-review's
+"Two Seats" rules; its findings join the same single fix wave.
 
 **Without a subagent tool:** read code-reviewer.md and perform that review
 yourself against the package, as a separate pass after the last task's

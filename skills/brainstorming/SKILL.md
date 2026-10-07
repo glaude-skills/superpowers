@@ -269,6 +269,12 @@ is the whole process.
 
 - Write the validated design (spec) to `docs/work/<slug>/design.md`
   - (User preferences for spec location override this default)
+- End the spec with a **Needs Confirmation** section: every decision the approved design did not make
+  or that changes its scope, as a table — `# | question | options | recommendation and why`.
+  Write the plan on the recommendations, but they are not decisions: when your partner picks
+  another option, fix the plan tasks that depended on it. Mark a resolved row
+  `~~Q3~~ **resolved YYYY-MM-DD**` instead of deleting it, and keep a one-line
+  "pending: … / resolved: …" summary above the table. Ask the open ones one at a time.
 - Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git
 

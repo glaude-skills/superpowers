@@ -39,6 +39,33 @@ Dispatch a `general-purpose` subagent, filling the template at [code-reviewer.md
 - `{BASE_SHA}` - Starting commit
 - `{HEAD_SHA}` - Ending commit
 
+## Two Seats for the Whole-Branch Review
+
+**When the branch has a contract to keep** — `docs/work/<slug>/dod.md` is FROZEN, or the project
+keeps rule documents assigned to paths (an `.ai/` routing table) — the whole-branch review gets
+two reviewers, dispatched **in parallel in one message**:
+
+| Seat | Template | Axis |
+|---|---|---|
+| Bug reviewer | [code-reviewer.md](code-reviewer.md) | bugs, regressions, security, test gaps |
+| Contract reviewer | [contract-reviewer.md](contract-reviewer.md) | frozen DoD, spec and plan, project rules |
+
+Give both the same range. Give the contract reviewer the rule documents the routing table assigns
+to `git diff --name-only <base>...HEAD`. Neither condition holds → one seat, code-reviewer.md only.
+Per-task reviews stay single-seat.
+
+**When the two seats disagree:**
+- The code **meets** a frozen DoD criterion and the bug reviewer's fix would break that criterion
+  → the contract reviewer wins for now. The open question is "should the contract change?", and
+  that is your human partner's decision. Order: partner approves → commit the DoD amendment alone
+  → rework. Never reverse it; fixing first erases the basis of this branch's verdict.
+- The code **violates** a criterion → that is a code fix, not a contract debate. Leave the
+  contract alone; raising an amendment here lowers the bar to fit the code.
+- No frozen criterion involved → the bug reviewer's verdict stands.
+
+Do not widen the first rule to "any finding a criterion touches". Most changed files have some
+criterion nearby; widening turns every bug report into a contract debate.
+
 **3. Act on feedback:**
 - Fix Critical issues immediately
 - Fix Important issues before proceeding
@@ -57,7 +84,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 [Dispatch code reviewer subagent]
   DESCRIPTION: Added verifyIndex() and repairIndex() with 4 issue types
-  PLAN_OR_REQUIREMENTS: Task 2 from docs/superpowers/plans/deployment-plan.md
+  PLAN_OR_REQUIREMENTS: Task 2 from docs/work/deployment/plan.md
   BASE_SHA: a7981ec
   HEAD_SHA: 3df7661
 
