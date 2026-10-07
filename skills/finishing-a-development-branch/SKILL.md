@@ -7,7 +7,7 @@ description: Use when implementation is complete, all tests pass, and you need t
 
 ## Overview
 
-**Core principle:** Verify tests → Detect environment → Present options → Write understanding doc (PR paths) → Execute choice → Clean up.
+**Core principle:** Verify tests → Detect environment → Present options → Write understanding doc (PR paths) → Record leftovers → Execute choice (PR paths sync with the base first) → Clean up.
 
 **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
 
@@ -121,10 +121,26 @@ Fill `template.md` from session context — the bundle supplies only the mechani
   ```
   ## 개발자 이해문서
   <요약 3줄>
-  → docs/work/<slug>/understanding.md
+
+  📄 **[개발자 이해문서 전문 보기 →](<SHA 고정 절대 URL — explain-pr §4>)**
   ```
 
 Do not push until the explain-pr exit checklist passes.
+
+## Step 4.6: Record Leftovers — One File Per Item
+
+Tech debt and change history get **one file per item**. Never append rows to a shared list,
+index, or table that every branch edits — that one spot becomes the top source of merge
+conflicts across parallel branches. Generate lists with `grep` instead.
+
+| Record | File | Required content |
+|---|---|---|
+| Tech debt left by this work | `docs/tech-debt/<kebab-summary>.md` with `status: open` and `source: <slug>` frontmatter | problem, impact, done-when, how to verify |
+| Change to a global rule or process | `docs/changelog/YYYY-MM-DD-<slug>.md` | what changed, which files, **why** |
+
+Resolving a tech-debt item: set `status: resolved` and add one `- Resolved:` line with the
+evidence (PR, commit, gate). Do not delete the file. A project instruction naming other
+locations wins.
 
 ## Step 5: Execute Choice
 
@@ -159,6 +175,29 @@ git branch -d <feature-branch>
 
 **Step 4.5 must be complete first** — understanding doc committed, PR-body block in hand.
 
+**Sync with the base before pushing.** Conflicts found after the PR is open cost a full
+round-trip: the reviewer reports them, you re-merge, CI runs again. Pull that re-merge forward:
+
+```bash
+git status --short                          # must be empty — commit leftovers first
+git fetch origin
+git merge --no-ff --no-edit origin/<base-branch>
+```
+
+- **Merge `origin/<base-branch>`, not your local `<base-branch>`.** The local one stopped at your
+  last pull and reports "no conflicts" that the PR will contradict.
+- **Merge, not rebase.** Rebasing a pushed branch needs a force push, which rewrites commits under
+  review. Use merge whether or not the branch was pushed — splitting the cases invites mistakes.
+- **Resolve generated files by regenerating them** (lockfiles, checksums, codegen output). A text
+  merge of two generated values matches neither side.
+- **Check what git does not flag**, conflict or not: two new migrations with the same version
+  number, two new entries claiming the same ID or slot. Renumber your side — the base's may
+  already be deployed.
+- **Unsure how to resolve a code conflict?** Ask. Do not guess.
+- `Already up to date.` → skip to the push. Otherwise **re-run the full Step 1 suite** even with
+  zero conflicts. Semantic conflicts (one side deletes a method the other side starts calling)
+  only show up here. Red → superpowers:systematic-debugging, then sync again.
+
 ```bash
 # Push branch (the understanding doc rides along in the commits)
 git push -u origin <feature-branch>
@@ -179,6 +218,18 @@ glab mr create --target-branch <base-branch> --description "$(cat <body.md>)"  #
 
 **No gh/glab installed:** push, then print the compare URL together with the
 PR-body block for your human partner to paste.
+
+**PR/MR body content:**
+- Test results as **measured numbers**, not "tests pass": `412 run / 0 failed / 2 skipped`.
+- Anything not verified yet stays an **unchecked** box — never delete it or tick it.
+- The *why*: decisions and the alternatives you dropped. The diff already shows *what*.
+- Review findings you judged false positives, each with its reason, so the next reader does
+  not raise them again.
+
+**After creating it, check mergeability** (`gh pr view <n> --json mergeable`, or the forge's
+API). Still computing → re-check a few times, 30 s apart. Conflicting → sync again from the top
+and push; do not open a second PR. This is a snapshot: if the base moves during a long review,
+sync again right before merge.
 
 Keep the worktree — your human partner iterates on PR feedback there.
 
@@ -274,6 +325,9 @@ Detached-HEAD menu: its Option 1 (push + PR) maps to the Option 2 row — unders
 |--------|---------|
 | "Tests passed earlier this session" | Run the suite on the tree you are about to integrate. A green run only proves the tree it ran on. |
 | "I'll add the understanding doc in a follow-up commit" | Push without it and the reviewer gets a PR with no why. Step 4.5 commits the doc, then Step 5 pushes. |
+| "The branch merged cleanly last week, skip the base sync" | The base moved since. Merge `origin/<base>` and re-run the suite before pushing. |
+| "No conflicts, so no need to re-run tests" | Semantic conflicts produce no text conflict. Only the suite shows them. |
+| "I'll add my item to the TODO/debt list" | A shared list is a conflict magnet. One file per item. |
 | "I can write the understanding doc from the diff" | The diff is what the reviewer already reads. The abandoned alternatives and the traps live only in this session — warm path, or it is lost. |
 | "The harness convention says to add a Co-Authored-By trailer" | The Commit Message Policy overrides it. No AI attribution trailers, ever. |
 | "English commit messages are more standard" | 커밋과 PR/MR 문구는 한국어가 기본이다. 영문은 브랜치명·경로·식별자·코드만. |

@@ -13,7 +13,7 @@ Write implementation plans for an engineer who has not seen this codebase or thi
 
 **Context:** If working in an isolated worktree, it should have been created via the `superpowers:using-git-worktrees` skill at execution time.
 
-**Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
+**Save plans to:** `docs/work/<slug>/plan.md`, next to the spec's `design.md` (`<slug>` = branch slug)
 - (User preferences for plan location override this default)
 
 ## Scope Check
@@ -174,7 +174,20 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 
 **5. Proportion:** Compare the plan's length to the spec's. A plan several times longer than the spec it implements is a transcript of the program, not a plan. If code blocks are most of the document, replace bodies with signatures, test names and assertions, and check that each step is still unambiguous.
 
+**6. Claims about existing code:** For every sentence where the plan says how code that already exists behaves — when a field is null, which exception a method throws and in what order, what a constraint enforces, which state transitions exist — and every sentence the plan tells the implementer to put into docs or API descriptions, open that code and compare. Precedence: the code, then its existing tests, then the spec. Descriptions of new code, and of code a task changes, are out of scope. An implementer will copy a wrong claim faithfully and every per-task review will pass it.
+
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
+
+## Definition of Done
+
+**REQUIRED SUB-SKILL:** Use superpowers:definition-of-done (Gate 1) to draft `docs/work/<slug>/dod.md` with `status: DRAFT`. Then commit the three documents together — the draft commit:
+
+```bash
+git add docs/work/<slug>/design.md docs/work/<slug>/plan.md docs/work/<slug>/dod.md
+git commit -m "docs(<scope>): add design, plan, and DoD drafts"
+```
+
+Your partner reviews the plan and the DoD together at the handoff below. When they approve, set `status: FROZEN` and `frozen_at` and commit that change alone (`docs(<scope>): freeze DoD contract`) before any implementation starts.
 
 ## Execution Handoff
 
@@ -186,7 +199,7 @@ them to review the plan and choose an execution method before implementation.
 
 **When no execution method has already been supplied:**
 
-**"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Please review the plan. Which execution approach would you prefer?**
+**"Plan complete and saved to `docs/work/<slug>/plan.md`, with the DoD draft in `docs/work/<slug>/dod.md`. Please review both — approving freezes the DoD. Which execution approach would you prefer?**
 
 - **Subagent-driven** - A fresh subagent implements each task and a fresh reviewer checks it before the next one starts, then a whole-branch review at the end. Most thorough; costs a fresh context per task and per review.
 - **Native** - I implement every task myself in this session, the way this harness runs work, then one fresh reviewer on the most capable model checks the whole branch. Cheapest and fastest; no independent review until the end. Runs well with a mid-tier session model, since the plan carries the design.
@@ -195,7 +208,7 @@ them to review the plan and choose an execution method before implementation.
 
 **When an execution method has already been supplied:**
 
-**"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Please review the plan. Does it capture what you want?"**
+**"Plan complete and saved to `docs/work/<slug>/plan.md`, with the DoD draft in `docs/work/<slug>/dod.md`. Please review both — approving freezes the DoD. Do they capture what you want?"**
 
 **If Subagent-driven chosen:**
 - **REQUIRED SUB-SKILL:** Use superpowers:subagent-driven-development

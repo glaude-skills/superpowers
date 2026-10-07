@@ -55,6 +55,32 @@ to skip the rest of the selected path. Read-only project exploration is
 allowed while those prerequisites remain incomplete.
 </HARD-GATE>
 
+## Re-entry Check (read-only, before anything is written)
+
+Before classifying, look for this topic's work directory, `docs/work/<slug>/`
+(`<slug>` is the branch slug). Only read — `ls` and `cat`. Two axes decide:
+does the directory exist, and is the request inside the scope already agreed?
+
+| Observed | Verdict | Entry point |
+|---|---|---|
+| No directory for this topic | **Initial run** | Classify the path below and start fresh |
+| Directory exists, request inside the agreed scope, your partner points at nothing specific | **Follow-up** | Return to the existing branch/worktree and resume at the interrupted stage. A FROZEN `dod.md` with unfinished implementation belongs here: keep the contract, continue the code. Nothing interrupted → say so and stop |
+| Directory exists, request inside the scope, your partner points at a specific artifact or part | **Partial rerun** | Resume at the stage that owns it — this wins over Follow-up — then finish any remaining interrupted stages |
+| Directory exists, request outside the agreed scope (usually `dod.md` is FROZEN or has a verdict) | **New run** | New slug, new branch, start fresh. The old artifacts stay in git history — do not move them |
+
+- **Scope means what was approved:** the approved spec or the frozen DoD. Work interrupted before
+  approval has no fixed scope yet — absorb new details where you resume instead of calling them
+  out of scope. A Bounded or Spike run that never wrote those documents takes its original request
+  as the scope.
+- **Decide by the two axes, not by words** like "update", "fix", or "again". The same "fix" can be
+  a Partial rerun or a New run.
+- **Several requests in one message:** split them and judge each. Out-of-scope units go to a new
+  slug; in-scope ones stay on the existing branch. If two out-of-scope units touch the same files,
+  propose bundling them and let your partner decide. Units whose files overlap run one after
+  another, never in parallel.
+- **Why this comes before workspace isolation:** a Follow-up must reuse the existing worktree. Check
+  first, or you create a second branch whose tree diverges from the one holding the work.
+
 ## Three Paths
 
 Before your first question, classify the request and say the
@@ -132,7 +158,7 @@ your path and complete them in order.
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
+6. **Write design doc** — save to `docs/work/<slug>/design.md` (`<slug>` = branch slug; the plan, DoD, and understanding doc join it there) and commit
 7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 8. **Adversarial design review (Claude subagent)** — dispatch a fresh `general-purpose` subagent with [spec-document-reviewer-prompt.md](spec-document-reviewer-prompt.md) to challenge the design before the user gate; fix the findings inline (see below)
 9. **User reviews written spec** — ask user to review the spec file before proceeding
@@ -241,7 +267,7 @@ is the whole process.
 
 **Documentation:**
 
-- Write the validated design (spec) to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
+- Write the validated design (spec) to `docs/work/<slug>/design.md`
   - (User preferences for spec location override this default)
 - Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git

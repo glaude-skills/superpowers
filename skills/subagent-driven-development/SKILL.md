@@ -489,6 +489,10 @@ delete this plan's workspace (`rm -rf <workspace>`) — the git history is
 the record now. Sibling directories belong to other plans; leave them
 alone.
 
+**If `docs/work/<slug>/dod.md` is FROZEN, print its Gate 2 verdict first** (REQUIRED
+SUB-SKILL: superpowers:definition-of-done), run against the branch head. `AWAITING_HUMAN`
+or `FAILED` is reported as such — never as "done".
+
 Use superpowers:finishing-a-development-branch.
 
 ## Common Rationalizations
