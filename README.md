@@ -25,6 +25,7 @@ This is a customized fork of [obra/superpowers](https://github.com/obra/superpow
 
 ### Changelog (fork)
 
+- **fork-v6.4.2.6** (plugin version 6.4.5): Korean prose rules add AI-favored words ("핵심", "짚어 보다"), narrative or aphorism titles, and the owner's "○○명" naming style.
 - **fork-v6.4.2.5** (plugin version 6.4.4): Korean prose rules allow explanatory analogies and conversational in-text questions; only decorative metaphors, aphorisms and question headings stay banned.
 - **fork-v6.4.2.4** (plugin version 6.4.3): `using-superpowers` language block: Korean prose style rules (no question or metaphor headings, no repeated words, no reader-guiding filler, no aphorisms, no duplicated parenthetical dates), taken from review feedback on a tech blog.
 - **fork-v6.4.2.3** — Jeju harness, second batch: contract reviewer seat with arbitration rules, implementer/reviewer report tags and re-dispatch rule, routing table in the `.ai/` policy, Needs Confirmation table in specs, one-time process feedback after the PR.
