@@ -25,6 +25,7 @@ This is a customized fork of [obra/superpowers](https://github.com/obra/superpow
 
 ### Changelog (fork)
 
+- **fork-v6.4.2.9** (plugin version 6.4.8): Korean prose rules ban vague situation phrases, subject-less contrast pairs, pre-emptive denials nobody raised, letter placeholders for named services, ambiguous verbs and coined word pairs.
 - **fork-v6.4.2.8** (plugin version 6.4.7): Korean prose rules ban lecturing tone, arrogant phrasing, vague summary sentences, machine-eyed "who calls it" questions and trailing "~고요." fragments.
 - **fork-v6.4.2.7** (plugin version 6.4.6): Korean prose rules ban report-style title subtitles ("서비스 세 곳 비교") and fix the good-title example.
 - **fork-v6.4.2.6** (plugin version 6.4.5): Korean prose rules add AI-favored words ("핵심", "짚어 보다"), narrative or aphorism titles, and the owner's "○○명" naming style.
