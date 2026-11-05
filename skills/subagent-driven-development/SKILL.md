@@ -5,11 +5,11 @@ description: Use when executing implementation plans with independent tasks in t
 
 # Subagent-Driven Development
 
-Execute plan by dispatching a fresh implementer subagent per task, a task review (spec compliance + code quality) after each, and a broad whole-branch review at the end.
+Execute plan by dispatching a fresh implementer subagent per task, one review (spec compliance + code quality) per chunk of related tasks, and a broad whole-branch review at the end.
 
 **Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
 
-**Core principle:** Fresh subagent per task + task review (spec + quality) + broad final review = high quality, fast iteration
+**Core principle:** Fresh subagent per task + one review per chunk (spec + quality) + broad final review = high quality, fast iteration
 
 **Narration:** between tool calls, narrate at most one short line — the
 ledger and the tool results carry the record.
@@ -65,12 +65,12 @@ digraph process {
     rankdir=TB;
 
     subgraph cluster_per_task {
-        label="Per Task";
+        label="Per Task (review once per chunk)";
         "Dispatch implementer subagent (./implementer-prompt.md)" [shape=box];
         "Implementer asks questions?" [shape=diamond];
         "Answer questions, provide context" [shape=box];
         "Implementer implements, tests, commits, self-reviews" [shape=box];
-        "Generate review package, dispatch task reviewer (./task-reviewer-prompt.md)" [shape=box];
+        "Chunk complete? Generate the chunk's review package, dispatch reviewer (./task-reviewer-prompt.md)" [shape=box];
         "Spec ✅ and quality approved?" [shape=diamond];
         "Finding conflicts with plan text?" [shape=diamond];
         "Rule on the conflict, ledger the ruling" [shape=box];
@@ -97,8 +97,8 @@ digraph process {
     "Implementer asks questions?" -> "Answer questions, provide context" [label="yes"];
     "Answer questions, provide context" -> "Implementer implements, tests, commits, self-reviews";
     "Implementer asks questions?" -> "Implementer implements, tests, commits, self-reviews" [label="no"];
-    "Implementer implements, tests, commits, self-reviews" -> "Generate review package, dispatch task reviewer (./task-reviewer-prompt.md)";
-    "Generate review package, dispatch task reviewer (./task-reviewer-prompt.md)" -> "Spec ✅ and quality approved?";
+    "Implementer implements, tests, commits, self-reviews" -> "Chunk complete? Generate the chunk's review package, dispatch reviewer (./task-reviewer-prompt.md)";
+    "Chunk complete? Generate the chunk's review package, dispatch reviewer (./task-reviewer-prompt.md)" -> "Spec ✅ and quality approved?";
     "Spec ✅ and quality approved?" -> "Append completion to ledger, mark todo complete" [label="yes"];
     "Spec ✅ and quality approved?" -> "Finding conflicts with plan text?" [label="no"];
     "Finding conflicts with plan text?" -> "Rule on the conflict, ledger the ruling" [label="yes"];
@@ -187,6 +187,42 @@ Rule on each conflict it surfaces — the spec is the binding authority, the
 plan is its argument — record the ruling beside its row, and dispatch
 Task 1. The review loop remains the net for conflicts that only emerge from
 implementation.
+
+## Review Chunks
+
+Review once per chunk, not once per task. Your human partner judged a
+review after every task too frequent (fork policy, 2026-11-05): on a
+well-specified plan, task after task came back Approved with only Minor
+findings, and each review re-read the same surroundings at full cost.
+
+Before Task 1, right after the pre-flight scan, group the plan's tasks into
+review chunks and write the table to the ledger (`Chunk <X>: Tasks <a>-<b>,
+<why these belong together>`). A chunk is consecutive tasks that build one
+piece together:
+
+- tasks that touch the same files or the same subsystem
+- a tool and the task that first uses it
+- several small tasks of the same shape (the same kind of edit repeated)
+
+A task stands alone as its own chunk only when it is large or risky by
+itself: new concurrency or timing logic, a security or data-loss surface, or
+a diff you expect to exceed a few hundred lines. The last chunk may fold into
+the final whole-branch review instead of getting its own review. Judge the
+boundaries yourself and do not ask; record each chunk's reason in the
+ledger.
+
+Inside a chunk, every task still gets its own brief, its own implementer,
+its own tests, its own commit, and its own ledger line. Only the review
+waits: when the chunk's last task reports DONE, generate one review package
+from the chunk's start (the BASE you recorded before its first task) to
+HEAD, and dispatch one reviewer with every brief and every report in the
+chunk. The fix loop, its five rounds, and the completion lines below then
+apply to the chunk as a whole. If an implementer inside a chunk reports
+DONE_WITH_CONCERNS about correctness, or BLOCKED, deal with it before the
+next task, exactly as for any task. When the chunk review comes back
+clean, write a completion line for each task in the chunk.
+
+Wherever the steps below say "task review", read "chunk review".
 
 ## Model Selection
 
@@ -294,7 +330,7 @@ Template: [implementer-prompt.md](implementer-prompt.md)
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** Generate the review package (`bash scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
+**DONE:** Generate the review package (`bash scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path. Do this only when the task closes its chunk (see Review Chunks); otherwise record the task's commits in the ledger and dispatch the next task in the chunk.
 
 **DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed to review.
 
@@ -377,7 +413,7 @@ Before the loop starts, two routes leave it immediately:
   the plan mandates it, and do not dispatch a fix that contradicts the plan
   without a recorded ruling.
 Everything else enters the loop. A fix round is one fix dispatch plus one
-scoped re-review. Five rounds maximum per task:
+scoped re-review. Five rounds maximum per chunk:
 
 **Rounds 1-3 — resume the original implementer.** Send it the open findings
 verbatim. Its context is intact: it knows the task, the code, and its own
