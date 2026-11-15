@@ -5,11 +5,11 @@ description: Use when executing implementation plans with independent tasks in t
 
 # Subagent-Driven Development
 
-Execute plan by dispatching a fresh implementer subagent per task (one for a run of small related tasks), one review (spec compliance + code quality) per chunk of related tasks, and a broad whole-branch review at the end.
+Execute plan by dispatching a fresh implementer subagent per task (one for a short run of small related tasks), one review (spec compliance + code quality) per risky chunk of related tasks, and a broad whole-branch review at the end. Every agent you dispatch costs tokens on every call it makes; see Token Budget.
 
 **Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
 
-**Core principle:** Fresh subagent per task + one review per chunk (spec + quality) + broad final review = high quality, fast iteration
+**Core principle:** Fresh subagent per task + one review per risky chunk (spec + quality) + broad final review = high quality, fast iteration, at a token cost you keep small (Token Budget)
 
 **Narration:** between tool calls, narrate at most one short line — the
 ledger and the tool results carry the record.
@@ -77,7 +77,7 @@ digraph process {
         "Finding conflicts with plan text?" [shape=diamond];
         "Rule on the conflict, ledger the ruling" [shape=box];
         "Fix round R of 2: R=1 resume implementer; R=2 fresh implementer" [shape=box];
-        "Dispatch scoped re-review (./re-review-prompt.md)" [shape=box];
+        "Scoped re-review if an operational defect was fixed (./re-review-prompt.md)" [shape=box];
         "All findings addressed?" [shape=diamond];
         "R = 2?" [shape=diamond];
         "Stop: escalate open findings to your partner" [shape=box];
@@ -103,8 +103,8 @@ digraph process {
     "Finding conflicts with plan text?" -> "Rule on the conflict, ledger the ruling" [label="yes"];
     "Rule on the conflict, ledger the ruling" -> "Fix round R of 2: R=1 resume implementer; R=2 fresh implementer";
     "Finding conflicts with plan text?" -> "Fix round R of 2: R=1 resume implementer; R=2 fresh implementer" [label="no"];
-    "Fix round R of 2: R=1 resume implementer; R=2 fresh implementer" -> "Dispatch scoped re-review (./re-review-prompt.md)";
-    "Dispatch scoped re-review (./re-review-prompt.md)" -> "All findings addressed?";
+    "Fix round R of 2: R=1 resume implementer; R=2 fresh implementer" -> "Scoped re-review if an operational defect was fixed (./re-review-prompt.md)";
+    "Scoped re-review if an operational defect was fixed (./re-review-prompt.md)" -> "All findings addressed?";
     "All findings addressed?" -> "Append completion to ledger, mark todo complete" [label="yes"];
     "All findings addressed?" -> "R = 2?" [label="no"];
     "R = 2?" -> "Fix round R of 2: R=1 resume implementer; R=2 fresh implementer" [label="no - next round"];
@@ -192,7 +192,7 @@ implementation.
 
 ## Review Chunks
 
-Review once per chunk, not once per task. Your human partner judged a
+Review once per risky chunk, not once per task. Your human partner judged a
 review after every task too frequent (fork policy, 2026-11-05): on a
 well-specified plan, task after task came back Approved with only Minor
 findings, and each review re-read the same surroundings at full cost.
@@ -222,20 +222,27 @@ review earns its cost only where those tests cannot see the risk:
 - Give a chunk its own review only when it carries a risk the tests do not
   pin: a new screen or input flow a person can get stuck in, a save or
   data format change, timing or concurrency logic, a security or data-loss
-  surface. Fold a low-risk chunk (deletions, placing assets, plan code
-  transcribed verbatim) into the review of the risky chunk next to it,
-  preferably the one that consumes its output. Six natural chunks usually
-  end as two or three reviews.
+  surface, money. Fold a low-risk chunk (deletions, placing assets, plan
+  code transcribed verbatim) into the review of the risky chunk next to
+  it, preferably the one that consumes its output. A plan with no risky
+  chunk gets no chunk review at all: the final whole-branch review is its
+  one review (fork policy, 2026-11-15, Token Budget). Six natural chunks
+  usually end as one or two chunk reviews plus the final one.
 - A chunk that only changes docs, status files, or capture and tooling
   scripts gets no review; its acceptance criteria, capture comparison, or
   the Gate 2 verdict is its check. Ledger that as a ruling.
 - Implementers run only the tests their brief names. The full suite runs
   at the end of each reviewed chunk and once before finishing, never once
   per task.
-- Run that full suite yourself, in the background, in the same turn you
-  dispatch the chunk's reviewer (fork policy, 2026-11-14). The reviewer
-  only reads, so neither waits for the other; an implementer told to run
-  the suite holds the whole loop for as long as the suite takes. Dispatch
+- Run that full suite yourself in the same turn you dispatch the chunk's
+  reviewer (fork policy, 2026-11-14). The reviewer only reads, so neither
+  waits for the other; an implementer told to run the suite holds the
+  whole loop for as long as the suite takes. This is one heavy job beside
+  one reader, which Token Budget allows: start no second heavy job
+  (build, measurement, window capture) beside it. When the reviewer runs
+  in the background, run the suite in the foreground with a timeout;
+  otherwise run it in the background and wait for its completion
+  notification, never checking on it in a loop. Dispatch
   no implementer into that working tree until the suite reports: its
   edits would change what the suite measures. A suite failure joins the
   review's findings in the same fix round. The run before finishing goes
@@ -300,6 +307,58 @@ that implementer. Single-file mechanical fixes also take the cheapest tier.
 - Touches multiple files with integration concerns → standard model
 - Requires design judgment or broad codebase understanding → most capable model
 
+## Token Budget (fork policy, 2026-11-15)
+
+Your human partner said "토큰도 너무 잡아 먹는거 같음. 특히 서브에이전트들
+때문에" (this eats too many tokens, above all because of the subagents).
+An agent re-reads its whole context on every tool call, so its cost is
+roughly (number of calls) x (average context). A long-lived agent grows
+both, so its cost grows with the square of its lifetime. Measured in one
+real session: one implementer given three tasks made 329 tool calls and
+read about 107M cached tokens, about 320k of context per call, because
+every screenshot it opened stayed in its context; that one agent was
+about half of what all ten of the session's subagents cost together. A
+verifier waiting on a background test checked its status 108 times.
+Three agents ran heavy jobs side by side (full suite, GPU frame timing,
+window captures): six processes overlapped, the timing failed falsely,
+and it had to be measured again.
+
+These rules bind you and go into every dispatch (the templates carry the
+ones a subagent keeps):
+
+- **Lifetime.** One fresh agent per task is the default, and it ends at
+  its commit: never hand a finished implementer its next task. Several
+  small tasks share one implementer only under the caps in The Task Loop.
+- **Narrow brief.** A dispatch carries the task brief, the files to
+  change, and the acceptance criteria. Never make an agent read the whole
+  plan or a whole design document: copy the section the task needs into
+  the dispatch, or name it by heading.
+- **Waiting on a command.** Run a long command (suite, build, export) in
+  the foreground with a timeout long enough for it to finish, and take
+  its result once. Never start it in the background and check its status
+  in a loop: every check is a call that re-reads the whole context. When
+  it must run in the background, wait for its completion notification
+  and nothing else.
+- **Images.** An image an agent opens stays in its context and is re-read
+  on every later call. Open only the few a verdict needs. When many must
+  be looked at, dispatch a short-lived agent that only looks at those
+  images and returns one verdict line per image, or hand them to your
+  partner.
+- **Heavy jobs one at a time.** A full suite, a build, a GPU or frame-time
+  measurement, and a capture that opens a window run one at a time across
+  all agents, yours included: overlapping them slows each one and makes
+  measurements fail falsely. What runs side by side is light: reading,
+  writing code and docs, selected tests. The full suite beside a reading
+  reviewer (Review Chunks) is one heavy job and one light one, which this
+  allows. Running agents side by side saves time, never tokens.
+- **Review by risk.** One review at the end of the plan is the default; a
+  chunk gets its own review only for the risks Review Chunks names. A
+  re-review runs only for an operational defect (The fix loop).
+- **The controller's share.** A merge, one status-file line, a check that
+  takes a few calls: do it yourself instead of dispatching. A dispatched
+  agent pays its start-up reading before its first useful call. Fixing
+  review findings is not in this share (The fix loop).
+
 ## The Task Loop
 
 **Batch small same-shape work.** When the plan lists several tasks that are
@@ -308,7 +367,8 @@ constant change, or field addition repeated across files — do not dispatch
 one subagent per task. Compose ONE dispatch brief listing every file and
 its change, send the whole batch to a single subagent, and review its diff
 as one unit. Reserve one-dispatch-per-task for work that needs its own
-judgment, its own tests, or its own review surface.
+judgment, its own tests, or its own review surface. A batch stays under
+the same caps as a run of small tasks (below).
 
 **One implementer for a run of small tasks (fork policy, 2026-11-14).**
 Your human partner said "task마다 그렇게 오래 걸릴 작업은 아닌 것 같은데"
@@ -316,7 +376,12 @@ Your human partner said "task마다 그렇게 오래 걸릴 작업은 아닌 것
 reads the same instructions, project rules and surrounding code before it
 writes a line, so a small task dispatched alone is mostly start-up. When
 consecutive tasks are each small and edit the same files or the same
-subsystem, dispatch ONE implementer for the run:
+subsystem, dispatch ONE implementer for the run, under two caps (fork
+policy, 2026-11-15, Token Budget): the run together is expected to take a
+few dozen tool calls at most, and no task in it opens images (captures,
+screenshots, rendered output). Past either cap the shared context grows
+on every call and soon costs more than the start-up it saved; give each
+task its own fresh implementer instead. Within the caps:
 
 - name every task's brief, in order, and state the decisions from earlier
   tasks once
@@ -362,7 +427,8 @@ and fix-round diffs need it.
   know; (4) your resolution of any ambiguity you noticed in the brief;
   (5) the report-file path and report contract. Exact values (numbers,
   magic strings, signatures, test cases) appear only in the brief. Never
-  make a subagent read the whole plan file.
+  make a subagent read the whole plan file or a whole design document;
+  name the files to change and the section it needs (Token Budget).
 - **Report file:** name the implementer's report file after the brief
   (brief `…/task-N-brief.md` → report `…/task-N-report.md`) and put it in
   the dispatch prompt. The implementer writes the full report there and
@@ -380,8 +446,9 @@ and fix-round diffs need it.
   review seat per task.
 - If an earlier task parked a finding in the area this task touches, carry
   a pointer to that ledger entry in the dispatch.
-- Record the implementer's agent identity from the dispatch result —
-  fix-loop rounds 1-3 resume this agent.
+- Record the implementer's agent identity from the dispatch result: fix
+  round 1 may resume this agent. Otherwise it ends at its commit; the
+  next task gets a fresh implementer unless it is in the same run.
 - Never dispatch multiple implementation subagents in parallel (conflicts).
 
 Template: [implementer-prompt.md](implementer-prompt.md)
@@ -390,7 +457,7 @@ Template: [implementer-prompt.md](implementer-prompt.md)
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** Generate the review package (`bash scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path and, in the same turn, start the full suite in the background (see Review Chunks). Do this only when the task closes its chunk; otherwise record the task's commits in the ledger and dispatch the next task in the chunk.
+**DONE:** Generate the review package (`bash scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory; it prints the unique file path it wrote. BASE is the commit you recorded before dispatching the implementer, never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path and, in the same turn, run the full suite (see Review Chunks). Do this only when the task closes its chunk; otherwise record the task's commits in the ledger and dispatch the next task in the chunk.
 
 **DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed to review.
 
@@ -411,7 +478,7 @@ rush it into implementation.
 ### 3. Review the task
 
 Per-task reviews are task-scoped gates. The broad review happens once, at the
-final whole-branch review. Never skip the task review, and never accept a
+final whole-branch review. Never skip a review the chunk table schedules, and never accept a
 report missing either verdict — spec compliance AND task quality are both
 required. Implementer self-review never replaces the task review; both are
 needed.
@@ -472,17 +539,28 @@ Before the loop starts, two routes leave it immediately:
   ledger the ruling before you act on it. Do not dismiss the finding because
   the plan mandates it, and do not dispatch a fix that contradicts the plan
   without a recorded ruling.
-Everything else enters the loop. A fix round is one fix dispatch plus one
-scoped re-review. Two rounds maximum per chunk (using-superpowers, Subagents
-and Stop Points):
+Everything else enters the loop. A fix round is one fix dispatch plus, when
+the round fixes an operational defect, one scoped re-review (fork policy,
+2026-11-15, Token Budget). An operational defect is a finding whose way of
+reaching users or operations you can write in one line; ledger that line
+with it. A finding you cannot write that line for is a check defect (a
+test, wording, structure): its fix is checked by the covering tests in the
+fix report and by the final whole-branch review, not by a re-review. Two
+rounds maximum per chunk, and round 2 runs only when the re-review leaves
+a finding open (using-superpowers, Subagents and Stop Points). When the
+project sets its own cap or counting rule for review chains, apply it as
+well; the loop stops at whichever cap comes first.
 
-**Round 1 — resume the original implementer.** Send it the open findings
-verbatim. Its context is intact: it knows the task, the code, and its own
-choices. If your harness cannot send another message to a live subagent,
-dispatch a fresh implementer carrying the brief path, the report-file path,
-and the findings — the report file is the persistent memory either way.
+**Round 1: resume the original implementer** when its context stayed
+small (within the run caps in The Task Loop: a few dozen calls, no
+images). Send it the open findings verbatim. Its context is intact: it
+knows the task, the code, and its own choices. If your harness cannot send
+another message to a live subagent, or the implementer grew past those
+caps, dispatch a fresh implementer carrying the brief path, the
+report-file path, and the findings; the report file is the persistent
+memory either way.
 
-**Round 2 — dispatch a fresh implementer** (the same agent definition; a
+**Round 2: dispatch a fresh implementer** (the same agent definition; a
 more capable one only when the project has it or your partner names a
 model), with the brief path, the report-file path, the open findings, and
 this framing: "A prior implementer attempted this task once; you own it
@@ -492,9 +570,9 @@ eyes are the remaining move.
 
 **Every round, either way:** the implementer fixes, re-runs the tests
 covering the amended code, appends its fix report to the same report file,
-and returns the short contract. Before re-dispatching the reviewer, confirm
-the fix report contains the covering tests, the command run, and the
-output; dispatch the re-review once all three are present. Name the
+and returns the short contract. Confirm the fix report contains the
+covering tests, the command run, and the output; when the round gets a
+re-review, dispatch it once all three are present. Name the
 covering test files in the fix message — a one-line fix does not need the
 whole suite.
 
@@ -511,7 +589,8 @@ minors — they never extend the loop.
 `Task <N>: fix round <R>/2 (<X> addressed, <Y> open — <finding one-liners>; commits <a7>..<b7>)`
 
 Never fix findings yourself in the controller session — your context stays
-clean for coordination, and controller fixes skip review.
+clean for coordination, and controller fixes skip review. Bookkeeping and
+checks of a few calls are yours (Token Budget); code fixes are not.
 
 **The breaker.** When round 2's re-review still leaves findings open, stop
 dispatching and escalate to your partner — do not adjudicate them yourself.
@@ -561,9 +640,11 @@ If the final whole-branch review returns findings, dispatch ONE fix subagent
 with the complete findings list — not one fixer per finding.
 Per-finding fixers each rebuild context and re-run suites; a real
 session's final-review fix wave cost more than all its tasks combined.
-Then run exactly one scoped re-review of the fix wave
+Then, when the findings include an operational defect (The fix loop), run
+exactly one scoped re-review of the fix wave
 (`bash scripts/review-package PLAN_FILE FIX_BASE HEAD` over the fix range,
-[re-review-prompt.md](re-review-prompt.md)).
+[re-review-prompt.md](re-review-prompt.md)); a wave of check defects only
+is checked by its covering tests and the suite run before finishing.
 Adjudicate any residual findings as in the task loop's breaker: park with
 rulings, or rule on the load-bearing ones and ledger what you decided. Only
 the four classes above stop you here. There is no second fix wave —
@@ -601,12 +682,17 @@ Use superpowers:finishing-a-development-branch.
 | "One more round will converge" | Past the cap, rounds don't converge — the failure is structural. Escalate to your partner. |
 | "The reviewer will just find something new anyway" | Scoped re-reviews verify fixes; they cannot wander. New findings on untouched code go to the ledger, not the loop. |
 | "This finding is obviously wrong, I'll drop it" | At the cap your partner decides, and every decision is a ledger entry. Silent discards are forbidden. |
-| "The fix was small, skip the re-review" | Unreviewed fixes are how regressions land. Every round ends with a scoped re-review. |
+| "The fix was small, skip the re-review" | Size is not the test. A round that fixes an operational defect ends with a scoped re-review, however small the fix; a round of check defects only is checked by its covering tests. |
+| "Re-review everything, to be safe" | A re-review re-reads the diff at full cost. If you cannot write in one line how the finding reaches users or operations, it is a check defect and its covering tests are the check. |
 | "Reviews slow the loop down" | The loop without reviews is just unverified churn. Reviews are the loop's brakes and steering. |
 | "Ledger bookkeeping is overhead" | The ledger is what survives compaction. Controllers without one have re-dispatched entire completed task sequences. |
 | "The implementer spawned its own reviewer — free extra assurance" | It's a duplicate seat reviewing the same diff; the task review is the gate. A worker-spawned reviewer is a defect to flag, not rigor. |
-| "Every task deserves its own fresh implementer" | A small task dispatched alone is mostly start-up reading. A run of small tasks on the same files shares one implementer; each task keeps its own tests and commit. |
-| "The chunk's last implementer can run the full suite" | That holds the loop for the suite's whole duration. Run it yourself in the background while the reviewer reads. |
+| "Every task deserves its own fresh implementer" | A small task dispatched alone is mostly start-up reading. A short run of small tasks on the same files shares one implementer; each task keeps its own tests and commit. |
+| "This implementer already knows the code, give it the next task too" | Its every later call re-reads everything it has seen. Past a few dozen calls, or once it has opened images, a fresh implementer is cheaper than its start-up. |
+| "The chunk's last implementer can run the full suite" | That holds the loop for the suite's whole duration. Run it yourself while the reviewer reads. |
+| "I'll start it in the background and check on it" | Every check re-reads the whole context; one verifier checked 108 times. Foreground with a timeout, or wait for the completion notification. |
+| "Let me look at all the captures myself" | Each image stays in context for every later call. Open the few a verdict needs; give the rest to a short image-only agent or to your partner. |
+| "Run the suite, the build and the captures in parallel to save time" | Heavy jobs run one at a time. Overlapped, they slow each other and the measurements fail falsely; parallel agents save time, never tokens. |
 | "I'll update `.ai/` later, in one pass" | A commit touching routes, data model, conventions, or progress without its `.ai/` update is incomplete. Same commit, every time. |
 
 ## Example Workflow

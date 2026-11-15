@@ -71,7 +71,10 @@ Subagent (general-purpose):
     and verify the claims against the diff. Do not re-run the suite to
     confirm their report. Run a test only when reading the code raises a
     specific doubt that no existing run answers — and then a focused test,
-    never a package-wide suite.
+    never a package-wide suite. Run it in the foreground with a timeout
+    and read its result once; never background it and check on it in a
+    loop. Open an image only when a verdict turns on it (fork policy,
+    2026-11-15).
 
     ## Output Format
 
