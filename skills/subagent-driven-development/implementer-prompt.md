@@ -61,6 +61,27 @@ Subagent (general-purpose):
     while the chunk is reviewed); test runs are kept to the minimum (fork
     policy, 2026-11-10).
 
+    ## Keep Your Context Small
+
+    Every tool call you make re-reads everything you have seen so far, so
+    each call costs more than the last (fork policy, 2026-11-15).
+    - Read the brief, the files it names, and the document sections it
+      names. Do not read whole design documents.
+    - Run a long command (suite, build, export) in the foreground with a
+      timeout long enough for it to finish, and read its result once.
+      Never run it in the background and check on it in a loop; if it
+      must run in the background, wait for its completion notification.
+    - An image you open stays in your context. Open only the few your
+      task's verdict needs; if it needs many, say so in your report
+      instead of opening them all.
+    - Run heavy jobs (full suite, build, GPU or frame-time measurement, a
+      capture that opens a window) only when the dispatch or brief tells
+      you to, one at a time.
+      Other agents may be running one, and overlapping them makes
+      measurements fail falsely.
+    - Your work ends at your commit and report. Do not go on to other
+      tasks the brief does not list.
+
     ## You Do Not Dispatch Subagents
 
     Do all of this task's work yourself. Never spawn a subagent to

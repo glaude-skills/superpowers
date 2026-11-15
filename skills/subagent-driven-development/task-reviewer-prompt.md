@@ -81,7 +81,13 @@ Subagent (general-purpose):
     package-wide suite, race detector run, or repeated/high-count loop. If
     heavy validation seems warranted, recommend it in your report instead of
     running it. If you cannot run commands in this environment, name the
-    test you would run.
+    test you would run. The controller may be running the full suite
+    while you read; never start a suite, build, measurement, or window
+    capture of your own. Run the focused test in the foreground with a
+    timeout and read its result once; never background it and check on
+    it in a loop. Open an image only when a finding turns on it: every
+    image stays in your context for every later call (fork policy,
+    2026-11-15).
 
     Warnings or other noise in the implementer's reported test output are
     findings — test output should be pristine.
