@@ -13,6 +13,10 @@ When you have multiple unrelated failures (different test files, different subsy
 
 **Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
 
+**Parallel saves time, not tokens (fork policy, 2026-11-15).** N agents side by side cost what N agents in sequence cost, and every agent re-reads its whole context on every call. Dispatch in parallel only when the wall-clock time matters, and keep each agent short-lived with a narrow prompt (superpowers:subagent-driven-development, Token Budget).
+
+**Heavy jobs one at a time.** A full test suite, a build, a GPU or frame-time measurement, and a capture that opens a window run one at a time across all agents. Overlapping them slows each one and makes measurements fail falsely: in one session three agents ran such jobs side by side, six processes overlapped, and a timing check failed falsely and had to be run again. Parallel agents do light work (reading, writing code or docs, selected tests); tell each one which heavy job, if any, is its own, and that the others are not.
+
 ## When to Use
 
 ```dot
@@ -43,6 +47,7 @@ digraph when_to_use {
 - Failures are related (fix one might fix others)
 - Need to understand full system state
 - Agents would interfere with each other
+- Each agent would run a heavy job (full suite, build, measurement, window capture)
 
 ## The Pattern
 

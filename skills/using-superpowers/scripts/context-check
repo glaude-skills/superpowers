@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+# context-check — gate for the project document rules in using-superpowers
+# ("Project Policy" and "Work Records Stay in the Project").
+#
+# Checks, from the repo root:
+#   1. every `@path` import in the entry chain exists        (fail)
+#   2. the entry file stays under its line cap                (fail)
+#   3. always-loaded bytes (entry + every import, LF-counted) stay under the cap (fail)
+#   4. no orphan rule document: each tracked .ai/**/*.md outside .ai/status/
+#      is imported or named (as a path) in the entry chain    (fail)
+#      (--exempt PATH skips one document; record why in docs/tech-debt/)
+#   5. no shared list file every branch writes:
+#      .ai/status/STATUS.md / TASKS.md                        (warn — legacy bootstrap)
+#
+# Caps ratchet: lower them when you can, never raise them to make room —
+# a new rule goes in only when as much comes out.
+#
+# Settings, highest precedence first: command-line flags, then one comment line in
+# the entry file:  <!-- context-check: --max-lines 120 --max-total-kb 48 -->
+#
+# Usage: context-check [--entry FILE] [--max-lines N] [--max-total-kb K] [--exempt PATH]...
+# Entry default: CONTEXT.md if it exists, else CLAUDE.md.
+set -euo pipefail
+
+root=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+cd "$root"
+
+entry=""
+if [ -f CONTEXT.md ]; then entry=CONTEXT.md; elif [ -f CLAUDE.md ]; then entry=CLAUDE.md; fi
+max_lines=120
+max_total_kb=48
+exempt=" "
+
+parse() {
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --entry) entry=$2; shift 2 ;;
+      --max-lines) max_lines=$2; shift 2 ;;
+      --max-total-kb) max_total_kb=$2; shift 2 ;;
+      --exempt) exempt="$exempt$2 "; shift 2 ;;
+      *) echo "unknown option: $1" >&2; exit 2 ;;
+    esac
+  done
+}
+
+# First pass only to learn --entry; flags are re-applied after the file comment.
+parse "$@"
+[ -n "$entry" ] && [ -f "$entry" ] || { echo "context-check: no entry file (CONTEXT.md / CLAUDE.md)" >&2; exit 2; }
+
+cfg=$(tr -d '\r' < "$entry" | sed -n 's/^<!-- *context-check: *\(.*\) *-->$/\1/p' | head -1)
+# shellcheck disable=SC2086
+[ -n "$cfg" ] && parse $cfg
+parse "$@"
+
+fail=0
+report() { echo "FAIL: $*"; fail=1; }
+warn() { echo "WARN: $*"; }
+
+# Lines outside fenced code blocks.
+body() { tr -d '\r' < "$1" | awk '/^```/{f=!f; next} !f'; }
+
+# Walk the import chain (imports are resolved relative to the importing file).
+declare -A seen=()
+chain=()
+walk() {
+  local file=$1 dir imp target
+  [ -n "${seen[$file]:-}" ] && return
+  seen[$file]=1
+  chain+=("$file")
+  dir=$(dirname "$file")
+  while IFS= read -r imp; do
+    imp=${imp#@}; imp=${imp%%[[:space:]]*}
+    [ -z "$imp" ] && continue
+    case "$imp" in
+      /*|~*) target=$imp ;;
+      *) target="$dir/$imp"; [ "$dir" = "." ] && target=$imp ;;
+    esac
+    target=${target#./}
+    if [ -f "$target" ]; then walk "$target"; else report "$file imports @$imp — file not found"; fi
+  done < <(body "$file" | grep -E '^@[^[:space:]]' || true)
+}
+walk "$entry"
+[ "$entry" != CLAUDE.md ] && [ -f CLAUDE.md ] && [ -z "${seen[CLAUDE.md]:-}" ] && walk CLAUDE.md
+
+# 2. entry line cap
+lines=$(tr -d '\r' < "$entry" | awk 'END{print NR}')
+[ "$lines" -le "$max_lines" ] || report "$entry has $lines lines, cap $max_lines — move feature detail to docs/work/<slug>/ or cut as much as you add"
+
+# 3. always-loaded bytes
+total=0
+for f in "${chain[@]}"; do total=$((total + $(tr -d '\r' < "$f" | wc -c))); done
+cap=$((max_total_kb * 1024))
+[ "$total" -le "$cap" ] || report "always-loaded context is $((total / 1024)) KB (${#chain[@]} files), cap ${max_total_kb} KB — demote a document to the on-demand table"
+
+# 4. orphan rule documents
+if git rev-parse --git-dir >/dev/null 2>&1; then
+  docs=$(git ls-files '.ai/*.md' '.ai/**/*.md' | grep -v '^\.ai/status/' | sort -u || true)
+else
+  docs=$(find .ai -name '*.md' -not -path '.ai/status/*' 2>/dev/null | sed 's|^\./||' | sort -u || true)
+fi
+named=$(for f in "${chain[@]}"; do tr -d '\r' < "$f"; done)
+for d in $docs; do
+  [ -n "${seen[$d]:-}" ] && continue
+  case "$exempt" in *" $d "*) continue ;; esac
+  grep -qF "$d" <<<"$named" || report "orphan rule document $d — import it (always read) or add an on-demand/routing row naming it, or delete it"
+done
+
+# 5. shared list files
+for s in .ai/status/STATUS.md .ai/status/TASKS.md; do
+  [ -f "$s" ] && warn "$s is a list every branch writes — move each task's state to .ai/status/<slug>.md"
+done
+
+if [ "$fail" -eq 0 ]; then
+  echo "OK: context-check ($entry, $lines lines, $((total / 1024)) KB in ${#chain[@]} always-loaded files)"
+fi
+exit "$fail"

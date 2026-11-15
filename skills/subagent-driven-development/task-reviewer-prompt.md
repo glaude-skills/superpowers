@@ -7,11 +7,13 @@ code quality.
 **Purpose:** Verify one task's implementation matches its requirements (nothing
 more, nothing less) and is well-built (clean, tested, maintainable)
 
+Dispatch the project's agent for this role from `.claude/agents/` when one exists, with this as its prompt; `general-purpose` only when none does (using-superpowers, Subagents and Stop Points).
+
 ```
 Subagent (general-purpose):
   description: "Review Task N (spec + quality)"
-  model: [MODEL — REQUIRED: choose per SKILL.md Model Selection; an omitted
-         model silently inherits the session's most expensive one]
+  model: [omit — the agent definition decides; fill only when your partner
+         named a model for this work]
   prompt: |
     You are reviewing one task's implementation: first whether it matches its
     requirements, then whether it is well-built. This is a task-scoped gate,
@@ -79,7 +81,13 @@ Subagent (general-purpose):
     package-wide suite, race detector run, or repeated/high-count loop. If
     heavy validation seems warranted, recommend it in your report instead of
     running it. If you cannot run commands in this environment, name the
-    test you would run.
+    test you would run. The controller may be running the full suite
+    while you read; never start a suite, build, measurement, or window
+    capture of your own. Run the focused test in the foreground with a
+    timeout and read its result once; never background it and check on
+    it in a loop. Open an image only when a finding turns on it: every
+    image stays in your context for every later call (fork policy,
+    2026-11-15).
 
     Warnings or other noise in the implementer's reported test output are
     findings — test output should be pristine.
@@ -188,7 +196,7 @@ Subagent (general-purpose):
 ```
 
 **Placeholders:**
-- `[MODEL]` — REQUIRED: reviewer model per SKILL.md Model Selection
+- `[MODEL]` — omit; the reviewer agent's definition decides (fill only when your partner named a model)
 - `[BRIEF_FILE]` — REQUIRED: the task brief file (`bash scripts/task-brief PLAN N`
   prints the path; same file the implementer worked from)
 - `[GLOBAL_CONSTRAINTS]` — the binding requirements copied verbatim from

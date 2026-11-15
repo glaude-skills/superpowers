@@ -12,7 +12,7 @@ Dispatch a code reviewer subagent to catch issues before they cascade. The revie
 ## When to Request Review
 
 **Mandatory:**
-- After each task in subagent-driven development
+- After each review chunk (a group of related tasks) in subagent-driven development
 - After completing major feature
 - Before merge to main
 
@@ -31,7 +31,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 **2. Dispatch code reviewer subagent:**
 
-Dispatch a `general-purpose` subagent, filling the template at [code-reviewer.md](code-reviewer.md)
+Dispatch the project's code-review agent (`.claude/agents/`, read-only) if it has one, else a `general-purpose` subagent, filling the template at [code-reviewer.md](code-reviewer.md). Pass no `model` argument (using-superpowers, Subagents and Stop Points)
 
 **Placeholders:**
 - `{DESCRIPTION}` - Brief summary of what you built

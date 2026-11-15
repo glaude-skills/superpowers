@@ -48,6 +48,15 @@ Honor any existing declared preference without asking. If the user declines cons
 
 **You have two mechanisms. Try them in this order.**
 
+### Location and branch name (fork policy, 2026-11-11)
+
+A project's own rule for worktree location and branch names wins. Otherwise:
+
+- **Location:** `.claude/worktrees/<branch with / replaced by ->` — the same place native tools use, so every worktree of the repo lives under one directory.
+- **Branch:** `<type>/<slug>` with `type` one of `feat`, `fix`, `refactor`, `chore`, `docs`, `test`, `perf`, `style`, and `issue-<N>-<topic>` as the slug when an issue exists (`feat/issue-12-login`). The same slug names `docs/work/<slug>/` and `.ai/status/<slug>.md`.
+- **Base:** `git fetch origin <base>` first and branch from `origin/<base>`.
+- **Ownership:** a native tool names its branch `worktree-<name>`; rename it at once with `git branch -m <type>/<slug>`. Record the worktree path on the status file's `branch:` line — that line is what marks the worktree as this work's.
+
 ### 1a. Native Worktree Tools (preferred)
 
 The user has asked for an isolated workspace (Step 0 consent). Do you already have a way to create a worktree? It might be a tool with a name like `EnterWorktree`, `WorktreeCreate`, a `/worktree` command, or a `--worktree` flag. If you do, use it and skip to Step 2.
@@ -73,7 +82,7 @@ Follow this priority order. Explicit user preference always beats observed files
    ```
    If found, use it. If both exist, `.worktrees` wins.
 
-3. **If there is no other guidance available**, default to `.worktrees/` at the project root.
+3. **If there is no other guidance available**, default to `.claude/worktrees/` at the project root (see Location and branch name).
 
 #### Safety Verification (project-local directories only)
 

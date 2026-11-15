@@ -4,6 +4,8 @@ Use this template when dispatching a code reviewer subagent.
 
 **Purpose:** Review completed work against requirements and code quality standards before it cascades into more work.
 
+Dispatch the project's agent for this role from `.claude/agents/` when one exists, with this as its prompt; `general-purpose` only when none does (using-superpowers, Subagents and Stop Points).
+
 ```
 Subagent (general-purpose):
   description: "Review code changes"
@@ -91,6 +93,11 @@ Subagent (general-purpose):
     - Backward compatibility considered?
     - Documentation complete?
     - No obvious bugs?
+
+    **Server logging (superpowers:writing-traceable-logs), for server code:**
+    - Every new endpoint, job and outside call (SMS, 알림톡, email, push, external API) carries the request id and writes its log line?
+    - No personal information unmasked in logs, exception messages or error responses?
+    - Operator or admin access to personal data writes an access record?
 
     ## Calibration
 

@@ -25,7 +25,8 @@ disagree.
   delivers your message, triggers a turn, and transparently reloads a
   child the harness evicted. Never dispatch a fresh implementer on the
   theory that a spawned agent cannot be messaged again; on V2 it
-  always can.
+  always can. A fresh implementer is for one whose context grew past
+  the run caps (superpowers:subagent-driven-development, The fix loop).
 - **Lifecycle:** V2 has no `close_agent`. Finished children are
   evicted automatically when slots are needed; leaving them unclosed
   costs nothing. Only V1 sessions have `close_agent` — there, close

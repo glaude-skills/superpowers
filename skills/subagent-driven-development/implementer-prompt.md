@@ -2,11 +2,13 @@
 
 Use this template when dispatching an implementer subagent.
 
+Dispatch the project's agent for this role from `.claude/agents/` when one exists, with this as its prompt; `general-purpose` only when none does (using-superpowers, Subagents and Stop Points).
+
 ```
 Subagent (general-purpose):
   description: "Implement Task N: [task name]"
-  model: [MODEL — REQUIRED: choose per SKILL.md Model Selection; an omitted
-         model silently inherits the session's most expensive one]
+  model: [omit — the agent definition decides; fill only when your partner
+         named a model for this work]
   prompt: |
     You are implementing Task N: [task name]
 
@@ -46,11 +48,39 @@ Subagent (general-purpose):
     커밋 메시지는 한국어로 쓰고, AI 작성 트레일러(`Co-Authored-By: Claude`,
     `🤖 Generated with ...` 등)는 절대 넣지 않는다.
 
+    서버 코드를 다루면 superpowers:writing-traceable-logs 를 따른다. 요청과 응답 로그,
+    외부 연계(SMS, 알림톡, 이메일, 푸시, 외부 API) 호출 로그, 개인정보 마스킹과
+    접속기록을 빠뜨리지 않는다.
+
     **While you work:** If you encounter something unexpected or unclear, **ask questions**.
     It's always OK to pause and clarify. Don't guess or make assumptions.
 
-    While iterating, run the focused test for what you're changing; run the
-    full suite once before committing, not after every edit.
+    While iterating, run the focused test for what you're changing. Before
+    committing, run the tests your brief names. Run the full suite only when
+    the dispatch tells you to (the controller normally runs it itself
+    while the chunk is reviewed); test runs are kept to the minimum (fork
+    policy, 2026-11-10).
+
+    ## Keep Your Context Small
+
+    Every tool call you make re-reads everything you have seen so far, so
+    each call costs more than the last (fork policy, 2026-11-15).
+    - Read the brief, the files it names, and the document sections it
+      names. Do not read whole design documents.
+    - Run a long command (suite, build, export) in the foreground with a
+      timeout long enough for it to finish, and read its result once.
+      Never run it in the background and check on it in a loop; if it
+      must run in the background, wait for its completion notification.
+    - An image you open stays in your context. Open only the few your
+      task's verdict needs; if it needs many, say so in your report
+      instead of opening them all.
+    - Run heavy jobs (full suite, build, GPU or frame-time measurement, a
+      capture that opens a window) only when the dispatch or brief tells
+      you to, one at a time.
+      Other agents may be running one, and overlapping them makes
+      measurements fail falsely.
+    - Your work ends at your commit and report. Do not go on to other
+      tasks the brief does not list.
 
     ## You Do Not Dispatch Subagents
 
@@ -91,7 +121,7 @@ Subagent (general-purpose):
 
     **How to escalate:** Report back with status BLOCKED or NEEDS_CONTEXT. Describe
     specifically what you're stuck on, what you've tried, and what kind of help you need.
-    The controller can provide more context, re-dispatch with a more capable model,
+    The controller can provide more context, re-dispatch a more capable agent,
     or break the task into smaller pieces.
 
     ## Before Reporting Back: Self-Review
