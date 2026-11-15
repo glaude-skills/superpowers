@@ -7,11 +7,13 @@ new breakage. It is not a fresh review — the full review already happened.
 **Purpose:** Verify each finding from the previous review was addressed, and
 that the fix itself broke nothing.
 
+Dispatch the project's agent for this role from `.claude/agents/` when one exists, with this as its prompt; `general-purpose` only when none does (using-superpowers, Subagents and Stop Points).
+
 ```
 Subagent (general-purpose):
   description: "Re-review Task N fix round R"
-  model: [MODEL — REQUIRED: choose per SKILL.md Model Selection; an omitted
-         model silently inherits the session's most expensive one]
+  model: [omit — the agent definition decides; fill only when your partner
+         named a model for this work]
   prompt: |
     You are re-reviewing one task's fix round. A previous review produced
     findings; an implementer has attempted to fix them. Your job is to
@@ -69,7 +71,10 @@ Subagent (general-purpose):
     and verify the claims against the diff. Do not re-run the suite to
     confirm their report. Run a test only when reading the code raises a
     specific doubt that no existing run answers — and then a focused test,
-    never a package-wide suite.
+    never a package-wide suite. Run it in the foreground with a timeout
+    and read its result once; never background it and check on it in a
+    loop. Open an image only when a verdict turns on it (fork policy,
+    2026-11-15).
 
     ## Output Format
 
@@ -101,8 +106,8 @@ Subagent (general-purpose):
 ```
 
 **Placeholders:**
-- `[MODEL]` — REQUIRED: reviewer model per SKILL.md Model Selection; scoped
-  re-reviews of small fix diffs take a cheap-to-mid tier
+- `[MODEL]` — omit; the reviewer agent's definition decides (fill only when
+  your partner named a model)
 - `[BRIEF_FILE]` — the task brief file (same file the implementer worked from)
 - `[FINDINGS]` — the Critical/Important findings and spec gaps from the
   previous review, copied verbatim, one per bullet

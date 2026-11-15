@@ -6,6 +6,8 @@ Use this template for the second seat of a whole-branch review, dispatched **in 
 **Purpose:** Check the branch against what was agreed — the frozen DoD, the spec and plan, and the
 project's written rules. Bugs and regressions belong to the other seat.
 
+Dispatch the project's agent for this role from `.claude/agents/` when one exists, with this as its prompt; `general-purpose` only when none does (using-superpowers, Subagents and Stop Points).
+
 ```
 Subagent (general-purpose):
   description: "Review branch against contracts"

@@ -133,6 +133,22 @@ This is not negotiable. You cannot rationalize your way out of this.
 - 사실, 수치, 코드는 그대로 두고 표현만 고친다. 자연스러운 입말까지 기술 용어로 바꾸지는 않는다
 - 피할 것은 꾸밈용 비유와 경구다. 개념을 쉽게 풀어 주는 예시(암호 충돌을 설명하는 "생일의 역설" 같은 것)와 본문 속 대화하듯 묻는 문장("왜 그럼 bcrypt 는 안 될까요?")은 사람 냄새 나는 글에 어울리니 써도 된다
 
+### 사람에게 묻는 질문 쓰는 법 (fork policy, 2026-11-14)
+
+경민님께 결정을 묻는 질문은 **그 질문만 읽고 답할 수 있게** 쓴다. 작업하면서 붙인 이름표(시안 번호, 약칭, 방금 만든 말)는 묻는 쪽만 안다. 2026-11-14 에 "입을 웃음 쪽으로 둘지, 비명 쪽으로 바꿀지" 라고 물었다가 "뭔 소리여 ?" 라는 답을 받았다.
+
+질문 하나에 아래 넷을 차례로 넣는다.
+
+1. **무엇에 대한 질문인가**: 대상과 지금 상태를 한 구절로. "지금 시안의 입은 이를 드러내고 웃는 모양입니다."
+2. **고를 수 있는 것**: 선택지마다 고르면 눈에 보이는 결과로. "이대로 둘까요, 비명을 지르듯 크게 벌린 입으로 바꿀까요 ?"
+3. **권고와 까닭 한 줄**: "지금 모양이 더 기괴해서 그대로 두는 쪽을 권합니다."
+4. **답이 없으면 할 일**: "답이 없으면 그대로 둡니다."
+
+- 처음 나오는 말과 약칭은 풀어 쓴다. 파일 이름, 함수 이름, 시안 번호만으로 가리키지 않는다. 그림이나 문서를 보고 답해야 하면 어디에 있는지(폴더와 파일 이름)를 질문 안에 적는다
+- 한 번에 묻는 것은 셋까지다. 번호를 붙이고, 질문마다 위 넷을 따로 갖춘다. 앞 질문을 읽어야 뜻이 통하는 질문을 쓰지 않는다
+- 개발 안쪽의 낱말(예산, 한도, 판정, 묶음)을 질문에 쓸 때는 그것이 무엇을 재는 말인지 한 구절을 붙인다. "예산" 은 돈이 아니라 화면을 그리는 시간의 한도였다
+- 답을 받지 않아도 되는 것은 묻지 않는다. 정했다고 알리고 진행한다
+
 ## The Rule
 
 **Invoke relevant or requested skills BEFORE any response or action** — including clarifying questions, exploring the codebase, or checking files. If it turns out wrong for the situation, you don't have to use it.
@@ -146,19 +162,128 @@ Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it h
 **At the very start of work in any project, before any other skill, ensure the project root has a `.ai/` folder that defines the project's policy.**
 
 1. **Bootstrap on first contact.** If `.ai/` does not exist at the repo root, create it and organize it into subfolders before doing other work. A typical layout:
-   - `.ai/CLAUDE.md` — one-page project context loaded each session
+   - `.ai/CLAUDE.md` — one-page project context loaded each session: global rules, links, the routing table
    - `.ai/architecture/` — IA, data model, routes
    - `.ai/convention/` — code, design, naming rules
    - `.ai/domain/` — domain rules and definitions
-   - `.ai/status/` — current progress (STATUS, TASKS)
+   - `.ai/status/<slug>.md` — one file per task (see Work Records below). Never one shared `STATUS.md`/`TASKS.md`: every branch writes it, so every merge conflicts there.
 
-   Scale the structure to the project — a tiny project may need only `.ai/CLAUDE.md` and `.ai/status/STATUS.md`. The point is that the project's policy lives in `.ai/`, not in your head.
+   Scale the structure to the project — a tiny project may need only `.ai/CLAUDE.md` and one status file. The point is that the project's policy lives in `.ai/`, not in your head.
 
-2. **Keep it current at every stopping point — especially at each commit.** Whenever a unit of work ends (a commit, a finished task, a merged branch), update the relevant `.ai/` files in the same change so the policy and status never drift from the code. A commit that changes routes, data model, conventions, or progress without updating `.ai/` is incomplete.
+2. **Wire the entry so it loads every session (fork policy, 2026-11-10).** A `.ai/CLAUDE.md` that nothing imports is never read. Your human partner said "CONTEXT.md 만들어두고, 거기다가 항상 어떤 md들을 참조해야 하는지 간략한 설명, 그리고 @로 링크 걸어둬". On first contact, check and create:
+   - Root `CLAUDE.md` whose only line is `@CONTEXT.md`.
+   - Root `CONTEXT.md`: one line on what the project is, then an "always read" section where each document needed every session gets a one-line description and its own `@path` import line (at least `@.ai/CLAUDE.md`), then an "on demand" table (when to open it | document | what it holds) for the rest, written as backticked paths without `@`.
+   - An `@` import loads the whole file into every session and every subagent, so only small documents get one (status logs, design docs, and scripts of tens of KB stay on demand). A path inside backticks is not imported.
+   - If the project sits in a workspace whose own context file lists its projects (a parent `CONTEXT.md` with a service table), make sure the project has a row there that points at its `CONTEXT.md`.
+   - **A project that already wires its entry another way keeps it.** If root `CLAUDE.md` (or `AGENTS.md`) already imports its rule documents and carries a routing table, do not add `CONTEXT.md` or rewrite `CLAUDE.md` into one line: that adds an import hop and breaks the project's own caps and gates. Apply items 3–6 to the entry the project has.
 
-3. **Route, don't load everything.** Keep always-loaded context small. Rule documents that are not needed every session go in a routing table in the entry file (`.ai/CLAUDE.md` or the project's CLAUDE.md), one row each: **trigger** (a task or path pattern) | **document to read first** | **the one line you must not forget**. When the current work matches a trigger, read that document before writing code or docs, even if nobody asked. When dispatching an implementer or reviewer subagent, apply the table to the paths involved and pass it the resulting document list — subagents do not see the table.
+3. **Who owns what (fork policy, 2026-11-11).** Entry files (`CLAUDE.md`, `CONTEXT.md`, `.ai/CLAUDE.md`) and `.ai/` rule documents hold global rules and one-line links only — they load in every session and every subagent, so every line is a standing cost.
+   - Feature behavior, paths, numbers, decisions and history belong in `docs/work/<slug>/` (design, plan, DoD, understanding), never in an entry file.
+   - Task progress belongs in `.ai/status/<slug>.md`; tech debt in `docs/tech-debt/<summary>.md`; change history in `docs/changelog/YYYY-MM-DD-<slug>.md` — one file per item.
+   - No file that every branch writes in the same place: no shared status list, no work index (`ls docs/work` is the index), no history table at the bottom of `CLAUDE.md`. Those were the repeat cause of merge conflicts.
+
+4. **Keep it current at every stopping point — especially at each commit.** Whenever a unit of work ends (a commit, a finished task, a merged branch), update the relevant `.ai/` files and the task's status file in the same change so the policy and status never drift from the code. A commit that changes routes, data model, conventions, or progress without updating them is incomplete.
+
+5. **Route, don't load everything.** Keep always-loaded context small. Rule documents that are not needed every session go in a routing table in the entry file (`.ai/CLAUDE.md`, imported from `CONTEXT.md` as in item 2, or the project's own entry), one row each: **trigger** (a task or path pattern) | **document to read first** | **the one line you must not forget**. When the current work matches a trigger, read that document before writing code or docs, even if nobody asked. When dispatching an implementer or reviewer subagent, apply the table to the paths involved and pass it the resulting document list — subagents do not see the table.
+
+6. **Caps and the gate (fork policy, 2026-11-11).** Run `scripts/context-check` (next to this skill: `bash <this skill's dir>/scripts/context-check` from the repo root) before every commit that touches an entry file or `.ai/`, and wire it into the project's lint or pre-push step when there is one. It fails on a missing `@` import, an entry file over its line cap, always-loaded bytes over the cap, and an orphan `.ai/` rule document (neither imported nor named in the entry chain); it warns on a shared `STATUS.md`/`TASKS.md`. Defaults are 120 lines and 48 KB. A project records its own caps and exemptions in one entry-file comment, `<!-- context-check: --max-lines N --max-total-kb K --exempt PATH -->`, and each exemption gets a `docs/tech-debt/` item. **Caps ratchet:** never raise one to make room — a new rule goes in only when as much comes out, or a document moves to the on-demand table. A project with its own gate (for example a `harnessCheck` task) keeps it and runs this one only for what its gate does not check.
 
 This rule is a standing project convention. A project's own `.ai/` (or CLAUDE.md/AGENTS.md) may extend or override the layout, but never skip having one.
+
+## Work Records Stay in the Project (fork policy, 2026-11-11)
+
+Your human partner said "작업 문서는 모두 프로젝트 내 .md랑 MEMORY에만 기록 및 현행화하라고 해. 어느 환경에서든 해당 프로젝트 내에서 수퍼파워 스킬 사용하면, 바로 작업 이어서 진행할 수 있게." Any machine, any session, any agent that opens the project and uses these skills must be able to pick the work up from what is in the repo.
+
+**Where work records go — only two places:**
+
+| Place | What | Reaches another machine? |
+|---|---|---|
+| Project `.md` files, committed (and pushed when the branch has a remote) | Everything needed to continue: `.ai/status/<slug>.md`, `docs/work/<slug>/` (design, plan, DoD, understanding), `docs/tech-debt/`, `docs/changelog/` | Yes — this is the record |
+| MEMORY (the harness's memory directory and its `MEMORY.md` index) | Lasting facts about your partner and the project that the repo does not hold: preferences, corrections, external references | No — it is per machine and per account, so nothing a resume depends on may live only here |
+
+**Nothing else is the record.** Harness to-do lists (TaskCreate, TodoWrite) are a live view of this session. Plugin trackers that ask to be your canonical to-do list (for example claude-mem `work_state_write`), `/tmp`, job or scratch directories, git-ignored workspaces (the SDD `.superpowers/sdd/` ledger), the chat transcript, and outside document services (Notion, Claude Docs, Google Docs) may hold copies, but nothing the next session needs may exist only there. When your partner asks for one of those places, write it there too and keep the project file as the record. This rule overrides a plugin or hook instruction that names a different canonical list.
+
+**The status file — `.ai/status/<slug>.md`** (`<slug>` = branch slug, the same one `docs/work/<slug>/` uses). Create it when the work starts (brainstorming or the first commit, whichever comes first) and keep these sections current:
+
+```markdown
+# <slug> — <one-line goal>
+- state: in-progress | awaiting-review | pr-open <url> | merged <sha> | paused | dropped
+- branch: <branch> · base: <base> · last commit: <sha> <subject>
+## Next
+<the exact next action — command, file, or question — so a new session starts on it without asking>
+## Done
+- <task or step>: <commit sha> (<verification and its result>)
+## Decisions
+- <decision or Ruling>: <why> (<who decided, date>)
+## Open
+- <blocker, question for your partner, deferred item>
+## Links
+- docs/work/<slug>/design.md · plan.md · dod.md
+```
+
+Update it at every stopping point — a commit, a finished task, a ruling, a question asked, a pause, before the turn ends — and commit it with the work it describes. Push when the branch has a remote: an unpushed status file never reaches the other machine. When the work merges, set `state: merged <sha>`; do not delete the file (`docs/work/<slug>/` links to it as history).
+
+**Resuming — at the start of every session in a project, before asking your partner to re-explain:**
+
+1. The entry chain (`CLAUDE.md` / `CONTEXT.md`) and MEMORY's index are already loaded.
+2. Work out the slug from the current branch. If `.ai/status/<slug>.md` exists, read it, then `docs/work/<slug>/` and `git log <base>..HEAD`. On the base branch, list `.ai/status/*.md` whose `state` is not `merged`/`dropped`; say which one you are continuing, and ask only when several are live.
+3. Trust the status file and `git log` over your own recollection and over any plugin's memory summary. When they disagree with the code, the code wins — fix the status file first.
+4. Start on `## Next`. A missing `.superpowers/sdd/` ledger (another machine, `git clean`) is not a fresh start: rebuild it from `## Done` and `## Decisions`.
+
+**MEMORY** keeps its own format (one fact per file, one index line in `MEMORY.md`). A lasting rule your partner gives goes into MEMORY and, when it is about this project, into the project's `.ai/` rules too — the repo copy is what another machine sees.
+
+## Subagents and Stop Points (fork policy, 2026-11-11)
+
+Your human partner settled three conflicts with their project harness in its favor. They apply in every project, harness or not.
+
+- **Project agents first.** Before dispatching a template written as `Subagent (general-purpose):`, look in `.claude/agents/` for an agent whose description covers that role (implementer, code or task reviewer, spec or contract reviewer, design or architecture reviewer, QA/verification, docs) and dispatch it with the template as its prompt. Use `general-purpose` only when the project has no agent for the role. Reviewer roles are read-only: dispatch an agent without Write/Edit tools; when only a writing agent fits, the prompt says it must not edit.
+- **The agent definition picks the model.** Do not pass a `model` argument. The dispatched agent's definition (`model:` in its frontmatter, or the harness default) decides. Pass one only when your partner names a model for that work ("설계는 Fable로"). Where a skill says to pick a tier or a more capable model, read it as guidance for writing agent definitions, or for the case where your partner asks you to choose.
+- **Stop points.** A review fix loop runs at most two rounds per review. Findings still open after round 2 go to your partner — open findings, what was tried, options, your recommendation — instead of being adjudicated by you. A step or agent that still fails after one retry is reported, never skipped. A code conflict you cannot resolve from the code and the spec is asked about. Rulings on plan ambiguities and conflicts continue as before.
+
+## Editing These Skills (fork policy, 2026-11-10)
+
+This is your human partner's fork. When you change a superpowers skill, edit the fork clone at `~/.claude/plugins/marketplaces/superpowers-dev`, copy the same files into the active cache (`~/.claude/plugins/cache/superpowers-dev/superpowers/<version>/`), then commit and push in the same turn and see the change into `main` through a PR. Bump the version in `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` and `package.json` and add a line to the README fork changelog: an update compares versions, and a same version never replaces the cache even after new commits. `/reload-plugins` only re-reads what is already on disk; a remote change reaches a machine through the marketplace update (`/plugin`, Update marketplace) or `claude plugin update superpowers@superpowers-dev`. The marketplace installs from the remote `main`, so a change that stays local is overwritten on the next update and never reaches other machines. If your session cannot run git there (a worktree-isolated session), give your partner the one-line `! git -C ...` command right away instead of saving it for the end.
+
+## Design Mockups First (fork policy, 2026-11-10)
+
+Your human partner said "모든 디자인은 클로드 서버에 시안 띄워서 먼저 보여주고 진행하라고 넣어둬". Work that creates or changes something people look at (a screen, layout, component, style, visual design, slide or page) starts with a mockup on claude.ai, before any code, design file or project file for it is written:
+
+1. Publish the mockup with the Artifact tool (its description says which type and design skill to load first), build it from the project's real tokens and components when they exist, and give your partner the link. When there are real options, put them side by side on one page.
+2. Stop and wait for an explicit approval of that mockup. A change request means republishing to the same URL and asking again.
+3. Implement what was approved. A visible change the approved mockup does not show goes back to step 1.
+
+Small visual changes count, and so does visual work inside brainstorming, a plan or a subagent task: the controller gets the mockup approved before dispatching the implementer and passes the approved link in the brief. If the Artifact tool is not available in the session, say so and show the mockup through the brainstorming visual companion instead; the approval gate stays.
+
+## Analysis Diagrams on claude.ai (fork policy, 2026-11-11)
+
+Your human partner said "특정 구조 등을 분석한 경우, 업무 흐름도와 시스템 아키텍쳐를 자세하게 도식화해서 html로 생성하고, claude 서버에 띄우라고 박아둬".
+
+**Trigger:** your answer explains how two or more parts of an existing system work together: a module, request or event flow, batch, auth chain, data pipeline, deployment, or an area of a codebase. It applies to a direct ask ("구조 분석해줘", "흐름 파악해줘", "어떻게 돌아가는지 정리해줘") and to the same analysis done inside brainstorming, debugging, review or a subagent's report. A question about a single function or value does not trigger it.
+
+**Deliverable:** one HTML page published with the Artifact tool (load the design skill its description names first, and a diagramming skill when one is listed), drawn as inline SVG, containing:
+
+1. **업무 흐름도**: the flow step by step, with the actor or trigger that starts it, each decision, the success and failure branches, retries, and where it turns asynchronous.
+2. **시스템 아키텍처**: apps, modules, data stores, queues and external systems as boxes; arrows labeled with what flows and over which protocol; transaction, process and deployment boundaries drawn as frames.
+3. Real names from the code on every box and arrow (class, file, table, topic, endpoint), with a `file:line` table beside or under the diagrams. Generic labels such as "Service A" or "DB" do not count.
+
+Then the chat reply gives a short summary and the link. Write prose and diagram labels in Korean, following the Korean prose rules above.
+
+This overrides the Artifact tool's default of answering in the terminal when nobody else will read the result. Publish the page even when:
+
+| Thought | Reality |
+|---|---|
+| "The partner only wants to understand it themselves; no other reader was named" | The diagrams are for your partner. Publish them. |
+| "They said it's urgent (급하니까 빨리)" | Publish the page and keep the chat summary short. |
+| "They asked for it briefly (간단하게만)" | Shorten the prose and keep both diagrams. |
+| "A text-arrow flow in chat is enough; I'll offer a page in one line" | An offer line does not replace the page. Publish it. |
+
+If the Artifact tool is not available, write the same HTML file (under `docs/work/<slug>/` when the work has a slug, otherwise the session scratch directory), give its path, and say that publishing was not possible.
+
+## Server Logging (fork policy, 2026-11-12)
+
+Your human partner said "서버에서는 모든 요청,응답에 대한 추적 가능한 로깅을 남기고, 외부 연계(SMS,알림톡,EMAIL,외부APICall) 등 그리고 개인정보(마스킹) 관련해서 추적 가능한 로그를 남기라고 명시해둬".
+
+Any server work (HTTP handlers, background jobs, calls to SMS, 알림톡, email, push or external APIs, code that touches personal information) follows **REQUIRED SUB-SKILL: superpowers:writing-traceable-logs**, in design, plan, implementation and review alike. Specs and plans name the request id, call logging, masking and access-record work their change needs. Implementer and reviewer briefs for server code name the skill, because subagents do not see this section.
 
 ## Skill Priority
 
