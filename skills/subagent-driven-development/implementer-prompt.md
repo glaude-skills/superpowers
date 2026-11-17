@@ -46,7 +46,8 @@ Subagent (general-purpose):
     Work from: [directory]
 
     커밋 메시지는 한국어로 쓰고, AI 작성 트레일러(`Co-Authored-By: Claude`,
-    `🤖 Generated with ...` 등)는 절대 넣지 않는다.
+    `🤖 Generated with ...` 등)는 절대 넣지 않는다. 커밋 메시지, 보고, 코드 주석,
+    문서처럼 사람이 읽는 한국어는 superpowers:writing-korean-prose 를 따른다.
 
     서버 코드를 다루면 superpowers:writing-traceable-logs 를 따른다. 요청과 응답 로그,
     외부 연계(SMS, 알림톡, 이메일, 푸시, 외부 API) 호출 로그, 개인정보 마스킹과
