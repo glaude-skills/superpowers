@@ -270,7 +270,7 @@ Your human partner settled three conflicts with their project harness in its fav
 
 ## Waking After Usage Limits (fork policy, 2026-11-18)
 
-Your human partner runs a scheduled task that wakes sessions stopped by a usage limit every 6 hours ("6시간마다 세션 한도 막혀서 멈춰 있으면 깨우는 스케쥴"). It wakes only the sessions listed in its list file, so a session that is not listed stays stopped.
+Your human partner runs a scheduled task that wakes sessions stopped by a usage limit ("6시간마다 세션 한도 막혀서 멈춰 있으면 깨우는 스케쥴"). Since 2026-11-19 it checks every hour, reads the reset time from the limit message, and when the reset is still ahead it schedules a one-shot retry (`claude-resume-retry`) three minutes after it: a 6-hourly run at 03:01 woke a session whose limit reset at 03:40, the wake itself hit the limit, and the session stayed stopped for five hours. It wakes only the sessions listed in its list file, so a session that is not listed stays stopped.
 
 The scheduler exists on a machine that has `~/.claude/resume-sessions.json` and `~/.claude/resume-sessions.ps1` (Windows task `claude-resume-sessions`). On such a machine, when you start or take over work that keeps running across hours (an orchestrating session with background subagents, a multi-task plan), make the current session the project's entry:
 
