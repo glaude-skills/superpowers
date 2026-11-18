@@ -284,7 +284,7 @@ The scheduler exists on a machine that has `~/.claude/resume-sessions.json` and 
 3. Run `powershell -NoProfile -ExecutionPolicy Bypass -File ~/.claude/resume-sessions.ps1 -DryRun` and read the last line of `~/.claude/resume-logs/resume.log`: your entry shows `state=working`.
 4. Tell your partner in one line that this session is on the wake list.
 
-On a machine without those files, say in one line that no wake schedule exists there.
+The scheduler itself ships with this skill: `scripts/resume-sessions.ps1` is the script and `scripts/install-resume-scheduler.ps1` installs it (copies the script into `~/.claude`, keeps an existing list file, registers the hourly task). On a Windows machine without those files, run `powershell -NoProfile -ExecutionPolicy Bypass -File <this skill's dir>/scripts/install-resume-scheduler.ps1`, then follow the steps above. After a skill update that changes `scripts/resume-sessions.ps1`, run the installer again so the copy in `~/.claude` matches. On a machine that is not Windows, say in one line that no wake schedule exists there.
 
 ## Editing These Skills (fork policy, 2026-11-10)
 
