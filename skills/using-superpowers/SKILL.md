@@ -257,8 +257,34 @@ Update it at every stopping point — a commit, a finished task, a ruling, a que
 Your human partner settled three conflicts with their project harness in its favor. They apply in every project, harness or not.
 
 - **Project agents first.** Before dispatching a template written as `Subagent (general-purpose):`, look in `.claude/agents/` for an agent whose description covers that role (implementer, code or task reviewer, spec or contract reviewer, design or architecture reviewer, QA/verification, docs) and dispatch it with the template as its prompt. Use `general-purpose` only when the project has no agent for the role. Reviewer roles are read-only: dispatch an agent without Write/Edit tools; when only a writing agent fits, the prompt says it must not edit.
-- **The agent definition picks the model.** Do not pass a `model` argument. The dispatched agent's definition (`model:` in its frontmatter, or the harness default) decides. Pass one only when your partner names a model for that work ("설계는 Fable로"). Where a skill says to pick a tier or a more capable model, read it as guidance for writing agent definitions, or for the case where your partner asks you to choose.
+- **Name the model on every dispatch (fork policy, 2026-11-18).** An omitted `model` inherits the session's model, and the session may be running Fable. Your partner said Fable runs only when they ask for it ("내가 쓰라고 할 때만 써", 2026-11-03), with one standing exception ("퀄리티나 연출 등이 중요한 작업들은 설계만 fable로 돌려도 돼", 2026-11-18). Pick the row and pass its value:
+
+  | Work being dispatched | `model` |
+  |---|---|
+  | Your partner named a model for this piece of work | that model, for this piece only |
+  | Design of work whose value is how it looks, plays or reads (visual design, staging and cinematics, story or script drafts): brainstorming, design document, draft | `fable` |
+  | Everything else: plans, implementation, review, verdicts, capture comparison, design of other work | `opus` |
+
+  A project agent definition (`.claude/agents/`) whose frontmatter sets `model:` keeps its own model. Where a skill says to pick a tier or a more capable model, this table decides.
 - **Stop points.** A review fix loop runs at most two rounds per review. Findings still open after round 2 go to your partner — open findings, what was tried, options, your recommendation — instead of being adjudicated by you. A step or agent that still fails after one retry is reported, never skipped. A code conflict you cannot resolve from the code and the spec is asked about. Rulings on plan ambiguities and conflicts continue as before.
+
+## Waking After Usage Limits (fork policy, 2026-11-18)
+
+Your human partner runs a scheduled task that wakes sessions stopped by a usage limit every 6 hours ("6시간마다 세션 한도 막혀서 멈춰 있으면 깨우는 스케쥴"). It wakes only the sessions listed in its list file, so a session that is not listed stays stopped.
+
+The scheduler exists on a machine that has `~/.claude/resume-sessions.json` and `~/.claude/resume-sessions.ps1` (Windows task `claude-resume-sessions`). On such a machine, when you start or take over work that keeps running across hours (an orchestrating session with background subagents, a multi-task plan), make the current session the project's entry:
+
+1. Your session id is the `sessionId` of your row in `claude agents --json` (match `cwd` and `name`).
+2. Back up `resume-sessions.json`, then set the project's entry (add one if missing; replace one whose session is no longer running) as UTF-8 JSON:
+   - `sessionId`: your session id
+   - `configDir`: the token folder of the account this session runs on (for example `~/.claude-saycore`)
+   - `cwd`: the project root
+   - `prompt`: what to check on waking: stopped subagents (continue them with SendMessage), orphan processes and leftover locks, and the status files whose `## Next` holds the live work
+   - `freshPromptFile`: a prompt file for a new session when resuming fails, kept current with the live work and the decisions your partner closed
+3. Run `powershell -NoProfile -ExecutionPolicy Bypass -File ~/.claude/resume-sessions.ps1 -DryRun` and read the last line of `~/.claude/resume-logs/resume.log`: your entry shows `state=working`.
+4. Tell your partner in one line that this session is on the wake list.
+
+On a machine without those files, say in one line that no wake schedule exists there.
 
 ## Editing These Skills (fork policy, 2026-11-10)
 
