@@ -344,9 +344,11 @@ Using a skill does not mean running every stage at full weight. Before you start
 
 | Size | Signals | Default path |
 |---|---|---|
+| Trivial | No design needed, the change is settled once it is stated (a number, a string, one condition, a small doc or config fix, a few lines in known files) | Do it yourself in the session: no subagent, no plan or task list, no brainstorming. Edit, run the relevant tests, commit, and open and merge the PR the project way |
 | Small | One endpoint, column, or flag added to a flow that already exists; roughly ≤600 changed lines; one module family | Bounded: short design in chat → approval → one or two implementer dispatches → one final review |
 | Medium / large | New domain, several apps, security, concurrency, data migration of existing records | Full pipeline |
 
+- **Trivial work stays inline (fork policy, 2026-11-21).** Your human partner said "설계가 필요하지 않고, 확정 후 task를 건너뛰우고 바로 구현해도 되는 간단한 것들은 에이전트한테 맡기지 말고 니가 직접해". A dispatched agent pays a fixed cost that a small fix does not: it rereads the project context, makes a worktree, runs the test harness and opens the PR, so a one-line change takes 10 to 20 minutes and tens of thousands of tokens. Several trivial fixes still go inline, one after another. Work that changes how something looks or plays is not trivial even when the edit is small, because it needs captures and a verdict; it follows its normal path.
 - For a small task, recommend the light path in **one** question at the start. Cite the project pipeline's own skip rules if it has them. Do not run the full pipeline without asking.
 - Keep a review on the risky parts only: migrations, auth, transaction boundaries.
 - Merge the base branch before you start, so number collisions (Flyway versions, ids) show up now instead of mid-review.
