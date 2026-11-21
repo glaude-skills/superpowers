@@ -35,6 +35,7 @@ This is a customized fork of [obra/superpowers](https://github.com/obra/superpow
 
 ### Changelog (fork)
 
+- **fork-v6.4.2.37** (plugin version 6.4.90): godot-work: the session too runs only the tests a merge touches (selected by changed paths and class names), and the full suite only before a build for others, once a day when idle, or when the selection passes 70%.
 - **fork-v6.4.2.36** (plugin version 6.4.89): the session tells its partner the model and effort of each agent it dispatches or lists.
 - **fork-v6.4.2.35** (plugin version 6.4.88): new skill godot-work holds the Godot rules (one heavy job at a time under a lock, agents run selected tests and the session runs the full suite every two or three merges, foreground waiting, worktree import, captures, shader variants); the test rule moves there from dispatching-parallel-agents.
 - **fork-v6.4.2.34** (plugin version 6.4.87): dispatching-parallel-agents moves the full test suite from each agent to the coordinator, once every two or three merges.
