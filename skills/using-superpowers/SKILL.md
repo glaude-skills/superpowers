@@ -257,15 +257,28 @@ Update it at every stopping point — a commit, a finished task, a ruling, a que
 Your human partner settled three conflicts with their project harness in its favor. They apply in every project, harness or not.
 
 - **Project agents first.** Before dispatching a template written as `Subagent (general-purpose):`, look in `.claude/agents/` for an agent whose description covers that role (implementer, code or task reviewer, spec or contract reviewer, design or architecture reviewer, QA/verification, docs) and dispatch it with the template as its prompt. Use `general-purpose` only when the project has no agent for the role. Reviewer roles are read-only: dispatch an agent without Write/Edit tools; when only a writing agent fits, the prompt says it must not edit.
-- **Name the model on every dispatch (fork policy, 2026-11-18).** An omitted `model` inherits the session's model, and the session may be running Fable. Your partner said Fable runs only when they ask for it ("내가 쓰라고 할 때만 써", 2026-11-03), with one standing exception ("퀄리티나 연출 등이 중요한 작업들은 설계만 fable로 돌려도 돼", 2026-11-18). Pick the row and pass its value:
+- **Name the model and effort on every dispatch (fork policy, 2026-11-18, effort and sonnet 2026-11-21).** An omitted `model` inherits the session's model, and the session may be running Fable. Your partner said Fable runs only when they ask for it ("내가 쓰라고 할 때만 써", 2026-11-03), with one standing exception ("퀄리티나 연출 등이 중요한 작업들은 설계만 fable로 돌려도 돼", 2026-11-18). On 2026-11-21 they approved this table with an effort per kind of work, so this table is the explicit instruction the Agent tool's `effort` field asks for. Pick the row and pass both values:
 
-  | Work being dispatched | `model` |
-  |---|---|
-  | Your partner named a model for this piece of work | that model, for this piece only |
-  | Design of work whose value is how it looks, plays or reads (visual design, staging and cinematics, story or script drafts): brainstorming, design document, draft | `fable` |
-  | Everything else: plans, implementation, review, verdicts, capture comparison, design of other work | `opus` |
+  | Work being dispatched | `model` | `effort` |
+  |---|---|---|
+  | Your partner named a model or effort for this piece of work | that, for this piece only | that |
+  | Design of work whose value is how it looks, plays or reads (visual design, staging and cinematics, story or script drafts): brainstorming, design document, draft | `fable` | `high` |
+  | Other design, plans | `opus` | `high` |
+  | Hard implementation: math, IK, shaders, a bug with no known cause | `opus` | `high` |
+  | Routine implementation that follows a written plan | `opus` | `medium` |
+  | Review, adversarial check, done verdict | `opus` | `high` |
+  | Capture comparison, judging images | `opus` | `medium` |
+  | Mechanical work: take captures and copy them, export, only run tests, check a merge, move doc lines | `sonnet` | `medium` |
+  | Finding code or files (Explore) | `sonnet` | `low` |
 
+  When it is unclear whether implementation is hard or routine, take the `high` row. A fork ignores both fields and runs as the session.
   A project agent definition (`.claude/agents/`) whose frontmatter sets `model:` keeps its own model. Where a skill says to pick a tier or a more capable model, this table decides.
+- **Keep each agent's context small (fork policy, 2026-11-21).** Every call of an agent rereads its whole context, so cost is calls times context size. Measured in one session: a fresh agent starts near 71k and settles near 120k after reading its brief and docs; one agent ran 493 calls up to 625k and read 210 million tokens. Write these into every brief:
+  - **Reading range.** Name the doc sections and line ranges the agent needs. Files over 15 KB are never read whole: grep for the heading or symbol, then read with offset and limit.
+  - **Wait in the foreground.** A command that fits in 10 minutes runs in the foreground with a timeout. A longer one runs in the background once, and the agent waits for its single completion notice without peeking at its output. Each wake rereads the whole context.
+  - **Few images.** The agent reads at most five images for its verdict. Other captures are copied to your partner's review folder unseen.
+- **Hand off by formula (fork policy, 2026-11-21).** C is the agent's current context: the `subagent_tokens` of its notification, equal to the input tokens of its last request (`message.usage` in its transcript). R is the calls it still needs, by its own estimate or the tasks left. S is a fresh agent's settled context, 120k. Hand off when R x (C - S) > 3C + 1M: the old agent spends about three calls at C to commit and write Next, and the new one about ten calls near 100k to settle. Raise the 1M to 2M when the work is mid-debugging and much of it is not written down. Worked out: below C = 150k never hand off; at 250k hand off when more than 14 calls remain, at 400k more than 8, at 600k more than 5. Check every notification, and read the transcript of a long-running agent when no notification comes. The same formula decides when to suggest a clear of the session itself, with S the context after reading the resume file.
+
 - **Stop points.** A review fix loop runs at most two rounds per review. Findings still open after round 2 go to your partner — open findings, what was tried, options, your recommendation — instead of being adjudicated by you. A step or agent that still fails after one retry is reported, never skipped. A code conflict you cannot resolve from the code and the spec is asked about. Rulings on plan ambiguities and conflicts continue as before.
 
 ## Waking After Usage Limits (fork policy, 2026-11-18)
