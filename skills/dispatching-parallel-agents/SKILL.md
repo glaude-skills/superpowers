@@ -19,7 +19,7 @@ When you have multiple unrelated failures (different test files, different subsy
 
 **Heavy jobs one at a time.** A full test suite, a build, a GPU or frame-time measurement, and a capture that opens a window run one at a time across all agents. Overlapping them slows each one and makes measurements fail falsely: in one session three agents ran such jobs side by side, six processes overlapped, and a timing check failed falsely and had to be run again. Parallel agents do light work (reading, writing code or docs, selected tests); tell each one which heavy job, if any, is its own, and that the others are not.
 
-**The full suite runs at the coordinator, not in each agent (fork policy, 2026-11-21).** An agent runs only the tests its change touches and the plan's regression guards, several files under one lock in a loop. The session runs the full suite once every two or three merges, when the lock is free, and fixes or dispatches any break it finds. In one session an agent spent 64 of its minutes queued behind other agents' full suites, and parallel agents finished no sooner than sequential ones because heavy jobs line up again at the lock. The trade: a break between two merged changes shows up after the merge, not before.
+**Godot projects:** the lock, the test split (agents run selected tests, the session runs the full suite every two or three merges), waiting and captures are in superpowers:godot-work.
 
 ## When to Use
 
