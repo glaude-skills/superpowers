@@ -35,6 +35,7 @@ This is a customized fork of [obra/superpowers](https://github.com/obra/superpow
 
 ### Changelog (fork)
 
+- **fork-v6.4.2.32** (plugin version 6.4.85): the first message after a clear becomes "방금 clear 했으니 이어서 진행해", and a session opening with it reads the resume prompt file first.
 - **fork-v6.4.2.31** (plugin version 6.4.84): the doc trim moves to Monday, Wednesday and Friday, and using-superpowers gains the hand-off to write before a clear or compact (resume prompt file, status Next, memory).
 - **fork-v6.4.2.30** (plugin version 6.4.83): using-superpowers gains a Monday and Thursday trim of the always-loaded project docs (one line per rule and routing row, details moved to a file read on demand).
 - **fork-v6.4.2.29** (plugin version 6.4.82): dispatching-parallel-agents gains a cap of three running agents at once, counting resumed agents and those waiting on a background job, also right after a usage limit resets.
