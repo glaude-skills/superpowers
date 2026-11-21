@@ -35,6 +35,7 @@ This is a customized fork of [obra/superpowers](https://github.com/obra/superpow
 
 ### Changelog (fork)
 
+- **fork-v6.4.2.35** (plugin version 6.4.88): new skill godot-work holds the Godot rules (one heavy job at a time under a lock, agents run selected tests and the session runs the full suite every two or three merges, foreground waiting, worktree import, captures, shader variants); the test rule moves there from dispatching-parallel-agents.
 - **fork-v6.4.2.34** (plugin version 6.4.87): dispatching-parallel-agents moves the full test suite from each agent to the coordinator, once every two or three merges.
 - **fork-v6.4.2.33** (plugin version 6.4.86): the dispatch model table gains an effort column and sonnet rows for mechanical work and search; briefs carry a reading range, foreground waiting and a five-image limit; a formula decides when to hand an agent off.
 - **fork-v6.4.2.32** (plugin version 6.4.85): the first message after a clear becomes "방금 clear 했으니 이어서 진행해", and a session opening with it reads the resume prompt file first.
