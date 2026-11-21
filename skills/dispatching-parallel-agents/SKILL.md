@@ -15,6 +15,8 @@ When you have multiple unrelated failures (different test files, different subsy
 
 **Parallel saves time, not tokens (fork policy, 2026-11-15).** N agents side by side cost what N agents in sequence cost, and every agent re-reads its whole context on every call. Dispatch in parallel only when the wall-clock time matters, and keep each agent short-lived with a narrow prompt (superpowers:subagent-driven-development, Token Budget).
 
+**At most three agents running at once (fork policy, 2026-11-19).** Count every agent of the session that has not finished: new dispatches, resumed ones, and agents waiting on their own background job. When three are running, queue the next task until one finishes. This holds after a usage limit resets too: resume at most three of the stopped agents and keep the rest queued. Agents do not dispatch their own subagents; say so in the brief. One session ran more than eight side by side and the token use jumped; another resumed five at once after a limit reset.
+
 **Heavy jobs one at a time.** A full test suite, a build, a GPU or frame-time measurement, and a capture that opens a window run one at a time across all agents. Overlapping them slows each one and makes measurements fail falsely: in one session three agents ran such jobs side by side, six processes overlapped, and a timing check failed falsely and had to be run again. Parallel agents do light work (reading, writing code or docs, selected tests); tell each one which heavy job, if any, is its own, and that the others are not.
 
 ## When to Use

@@ -35,6 +35,7 @@ This is a customized fork of [obra/superpowers](https://github.com/obra/superpow
 
 ### Changelog (fork)
 
+- **fork-v6.4.2.29** (plugin version 6.4.82): dispatching-parallel-agents gains a cap of three running agents at once, counting resumed agents and those waiting on a background job, also right after a usage limit resets.
 - **fork-v6.4.2.28** (plugin version 6.4.81): "Scale the Process to the Task" gains a Trivial row and rule: work that needs no design and is settled once stated is done inline by the session, not dispatched to a subagent.
 - **fork-v6.4.2.27** (plugin version 6.4.80): the resume scheduler now ships with `using-superpowers` (`scripts/resume-sessions.ps1` with home-relative paths, `scripts/install-resume-scheduler.ps1` that copies it and registers the hourly task), so another Windows machine gets the hourly check and the retry after the reset time from the skill.
 - **fork-v6.4.2.26** (plugin version 6.4.79): "Waking After Usage Limits" records that the resume scheduler now checks hourly and schedules a one-shot retry just after the reset time read from the limit message, after a 6-hourly wake fired 39 minutes before the reset and failed.
