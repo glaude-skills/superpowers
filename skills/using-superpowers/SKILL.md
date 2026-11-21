@@ -272,6 +272,7 @@ Your human partner settled three conflicts with their project harness in its fav
   | Finding code or files (Explore) | `sonnet` | `low` |
 
   When it is unclear whether implementation is hard or routine, take the `high` row. A fork ignores both fields and runs as the session.
+  Tell your partner the model and effort of every agent you dispatch, in the reply that announces it ("opus high", "sonnet medium"), and when you list running agents. Your partner asked for it on 2026-11-21 ("서브에이전트 호출할 때 마다 어떤 모델, 어떤 effort로 호출했는지 알려줘"). An agent dispatched without an `effort` runs at the session's default; say so instead of guessing a level.
   A project agent definition (`.claude/agents/`) whose frontmatter sets `model:` keeps its own model. Where a skill says to pick a tier or a more capable model, this table decides.
 - **Keep each agent's context small (fork policy, 2026-11-21).** Every call of an agent rereads its whole context, so cost is calls times context size. Measured in one session: a fresh agent starts near 71k and settles near 120k after reading its brief and docs; one agent ran 493 calls up to 625k and read 210 million tokens. Write these into every brief:
   - **Reading range.** Name the doc sections and line ranges the agent needs. Files over 15 KB are never read whole: grep for the heading or symbol, then read with offset and limit.
