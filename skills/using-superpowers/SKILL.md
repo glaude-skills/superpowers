@@ -21,7 +21,7 @@ This is not negotiable. You cannot rationalize your way out of this.
 
 ### 한국어 문체: AI 같은 버릇 금지
 
-답변, 문서, 커밋과 PR 메시지, 블로그 글, 코드 주석, mermaid 라벨처럼 사람이 읽는 한국어는 사람이 쓴 기술 문서처럼 쓴다. 아래는 경민님이 "전형적인 AI 문체"로 지적한 것을 부류별로 묶은 것이다. 지적받은 문장만 말고 같은 부류를 글 전체에서 찾아 피한다. 기준은 "한국 개발자가 자기 블로그에 실제로 이렇게 쓰는가" 하나다. 블로그 원고용으로 더 자세한 정본은 tech-blog 저장소 `docs/writing/ai-style.md` 이고, 새 지적은 그 파일과 이 표에 함께 반영한다.
+답변, 문서, 커밋과 PR 메시지, 블로그 글, 코드 주석, mermaid 라벨처럼 사람이 읽는 한국어는 사람이 쓴 기술 문서처럼 쓴다. 아래는 경민님이 전형적인 AI 문체로 지적한 것을 부류별로 묶은 것이다. 지적받은 문장만 말고 같은 부류를 글 전체에서 찾아 피한다. 기준은 "한국 개발자가 자기 블로그에 실제로 이렇게 쓰는가" 하나다. 블로그 원고용으로 더 자세한 정본은 tech-blog 저장소 `docs/writing/ai-style.md` 이고, 새 지적은 그 파일과 이 표에 함께 반영한다.
 
 서브에이전트는 이 절을 받지 못한다. 서브에이전트에게 커밋 메시지, 보고, 문서, 주석처럼 사람이 읽는 한국어를 쓰게 할 때는 브리프에 `superpowers:writing-korean-prose` 를 적는다. 그 스킬이 이 절을 읽게 한다.
 
@@ -155,7 +155,7 @@ This is not negotiable. You cannot rationalize your way out of this.
 
 ### 사람에게 묻는 질문 쓰는 법 (fork policy, 2026-11-14)
 
-경민님께 결정을 묻는 질문은 **그 질문만 읽고 답할 수 있게** 쓴다. 작업하면서 붙인 이름표(시안 번호, 약칭, 방금 만든 말)는 묻는 쪽만 안다. 2026-11-14 에 "입을 웃음 쪽으로 둘지, 비명 쪽으로 바꿀지" 라고 물었다가 "뭔 소리여 ?" 라는 답을 받았다.
+경민님께 결정을 묻는 질문은 **그 질문만 읽고 답할 수 있게** 쓴다. 작업하면서 붙인 이름표(시안 번호, 약칭, 방금 만든 말)는 묻는 쪽만 안다. 2026-11-14 에 "입을 웃음 쪽으로 둘지, 비명 쪽으로 바꿀지" 라고 물었다가 무슨 뜻인지 모르겠다는 답을 받았다.
 
 질문 하나에 아래 넷을 차례로 넣는다.
 
@@ -190,7 +190,7 @@ Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it h
 
    Scale the structure to the project — a tiny project may need only `.ai/CLAUDE.md` and one status file. The point is that the project's policy lives in `.ai/`, not in your head.
 
-2. **Wire the entry so it loads every session (fork policy, 2026-11-10).** A `.ai/CLAUDE.md` that nothing imports is never read. Your human partner said "CONTEXT.md 만들어두고, 거기다가 항상 어떤 md들을 참조해야 하는지 간략한 설명, 그리고 @로 링크 걸어둬". On first contact, check and create:
+2. **Wire the entry so it loads every session (fork policy, 2026-11-10).** A `.ai/CLAUDE.md` that nothing imports is never read. Your human partner asked for a CONTEXT.md that briefly says which docs to read and links them with @. On first contact, check and create:
    - Root `CLAUDE.md` whose only line is `@CONTEXT.md`.
    - Root `CONTEXT.md`: one line on what the project is, then an "always read" section where each document needed every session gets a one-line description and its own `@path` import line (at least `@.ai/CLAUDE.md`), then an "on demand" table (when to open it | document | what it holds) for the rest, written as backticked paths without `@`.
    - An `@` import loads the whole file into every session and every subagent, so only small documents get one (status logs, design docs, and scripts of tens of KB stay on demand). A path inside backticks is not imported.
@@ -212,7 +212,7 @@ This rule is a standing project convention. A project's own `.ai/` (or CLAUDE.md
 
 ## Work Records Stay in the Project (fork policy, 2026-11-11)
 
-Your human partner said "작업 문서는 모두 프로젝트 내 .md랑 MEMORY에만 기록 및 현행화하라고 해. 어느 환경에서든 해당 프로젝트 내에서 수퍼파워 스킬 사용하면, 바로 작업 이어서 진행할 수 있게." Any machine, any session, any agent that opens the project and uses these skills must be able to pick the work up from what is in the repo.
+Your human partner asked that all working documents be written and kept current only in the project's .md files and MEMORY, so that the work can continue right away in any environment that opens the project with these skills. Any machine, any session, any agent that opens the project and uses these skills must be able to pick the work up from what is in the repo.
 
 **Where work records go — only two places:**
 
@@ -257,7 +257,7 @@ Update it at every stopping point — a commit, a finished task, a ruling, a que
 Your human partner settled three conflicts with their project harness in its favor. They apply in every project, harness or not.
 
 - **Project agents first.** Before dispatching a template written as `Subagent (general-purpose):`, look in `.claude/agents/` for an agent whose description covers that role (implementer, code or task reviewer, spec or contract reviewer, design or architecture reviewer, QA/verification, docs) and dispatch it with the template as its prompt. Use `general-purpose` only when the project has no agent for the role. Reviewer roles are read-only: dispatch an agent without Write/Edit tools; when only a writing agent fits, the prompt says it must not edit.
-- **Name the model and effort on every dispatch (fork policy, 2026-11-18, effort and sonnet 2026-11-21).** An omitted `model` inherits the session's model, and the session may be running Fable. Your partner said Fable runs only when they ask for it ("내가 쓰라고 할 때만 써", 2026-11-03), with one standing exception ("퀄리티나 연출 등이 중요한 작업들은 설계만 fable로 돌려도 돼", 2026-11-18). On 2026-11-21 they approved this table with an effort per kind of work, so this table is the explicit instruction the Agent tool's `effort` field asks for. Pick the row and pass both values:
+- **Name the model and effort on every dispatch (fork policy, 2026-11-18, effort and sonnet 2026-11-21).** An omitted `model` inherits the session's model, and the session may be running Fable. Your partner said Fable runs only when they ask for it (2026-11-03), with one standing exception: work where quality or staging matters may run its design alone on Fable (2026-11-18). On 2026-11-21 they approved this table with an effort per kind of work, so this table is the explicit instruction the Agent tool's `effort` field asks for. Pick the row and pass both values:
 
   | Work being dispatched | `model` | `effort` |
   |---|---|---|
@@ -272,7 +272,7 @@ Your human partner settled three conflicts with their project harness in its fav
   | Finding code or files (Explore) | `sonnet` | `low` |
 
   When it is unclear whether implementation is hard or routine, take the `high` row. A fork ignores both fields and runs as the session.
-  Tell your partner the model and effort of every agent you dispatch, in the reply that announces it ("opus high", "sonnet medium"), and when you list running agents. Your partner asked for it on 2026-11-21 ("서브에이전트 호출할 때 마다 어떤 모델, 어떤 effort로 호출했는지 알려줘"). An agent dispatched without an `effort` runs at the session's default; say so instead of guessing a level.
+  Tell your partner the model and effort of every agent you dispatch, in the reply that announces it ("opus high", "sonnet medium"), and when you list running agents. Your partner asked for it on 2026-11-21. An agent dispatched without an `effort` runs at the session's default; say so instead of guessing a level.
   A project agent definition (`.claude/agents/`) whose frontmatter sets `model:` keeps its own model. Where a skill says to pick a tier or a more capable model, this table decides.
 - **Keep each agent's context small (fork policy, 2026-11-21).** Every call of an agent rereads its whole context, so cost is calls times context size. Measured in one session: a fresh agent starts near 71k and settles near 120k after reading its brief and docs; one agent ran 493 calls up to 625k and read 210 million tokens. Write these into every brief:
   - **Reading range.** Name the doc sections and line ranges the agent needs. Files over 15 KB are never read whole: grep for the heading or symbol, then read with offset and limit.
@@ -282,21 +282,21 @@ Your human partner settled three conflicts with their project harness in its fav
   - Dispatch one plan task per agent. Do not bundle two tasks ("DC-16 then DC-17") into one brief; the second task drags the whole first task's context through every call. A small follow-up that touches the same files (a one-line fix the coordinator found) may ride along.
   - Write a countable stop into every brief: "When you have made about 200 tool calls, or when one PR is merged, commit, write Next in the status file, report, and stop." Calls and merges are things the agent can count; context is not.
   - On every notification, apply the formula below to the reported `subagent_tokens`; when it says hand off, send the agent a message to commit, write Next and stop, then dispatch a fresh agent on the same branch.
-  Your partner asked for it on 2026-11-22 ("권고대로 하고, 슈퍼파워 스킬에 명시해둬").
-- **Feedback and small fixes (fork policy, 2026-11-23).** Your partner noticed that their feedback and bug fixes took as long as whole features ("내 피드백이나 버그 수정은 오래 걸리는 것 같네"). Measured that day: a one or two line fix took 48 to 70 minutes, mostly in pre-PR impact tests and lock waits; a hand pose fix took 231 calls because each candidate capture was read into context. Tokens follow calls times context, not wall time: waiting in the foreground is cheap, waking repeatedly is not. So:
+  Your partner asked for it on 2026-11-22.
+- **Feedback and small fixes (fork policy, 2026-11-23).** Your partner noticed that their feedback and bug fixes took as long as whole features. Measured that day: a one or two line fix took 48 to 70 minutes, mostly in pre-PR impact tests and lock waits; a hand pose fix took 231 calls because each candidate capture was read into context. Tokens follow calls times context, not wall time: waiting in the foreground is cheap, waking repeatedly is not. So:
   - Small fixes test narrowly before the PR, and the coordinator runs the impact batch every two or three small merges (godot-work, "작은 처방은 PR 앞에 좁은 테스트만").
   - Bundle feedback items that touch the same files or the same screen into one agent, at most three. Each item still gets its own red test or before and after capture. Unrelated items stay in separate agents.
   - A visual feedback brief states the pass criterion in numbers or in one checkable sentence before any capture (for example "no finger penetrates the object, gap under 2 mm, thumb on the opposite face"), and names how many candidate rounds the agent may shoot (one grid, then one refinement). The five image limit above still holds.
   - Multi-step measurements (bisecting commits, repeated budget runs) are scripted into one run with one completion notice (godot-work, "되풀이 측정은 스크립트 하나로 묶는다").
   - An agent that stopped with background work of its own can wake again when that work finishes. Before you hand its branch or worktree to a new agent, stop the old one (TaskStop) and check that no Godot process of its own is left, or two agents will edit one worktree.
-  Your partner asked for it on 2026-11-23 ("지금 정한것들 수퍼파워 스킬에 넣어둬").
+  Your partner asked for it on 2026-11-23.
 - **Hand off by formula (fork policy, 2026-11-21).** C is the agent's current context: the `subagent_tokens` of its notification, equal to the input tokens of its last request (`message.usage` in its transcript). R is the calls it still needs, by its own estimate or the tasks left. S is a fresh agent's settled context, 120k. Hand off when R x (C - S) > 3C + 1M: the old agent spends about three calls at C to commit and write Next, and the new one about ten calls near 100k to settle. Raise the 1M to 2M when the work is mid-debugging and much of it is not written down. Worked out: below C = 150k never hand off; at 250k hand off when more than 14 calls remain, at 400k more than 8, at 600k more than 5. Check every notification, and read the transcript of a long-running agent when no notification comes. The same formula decides when to suggest a clear of the session itself, with S the context after reading the resume file.
 
 - **Stop points.** A review fix loop runs at most two rounds per review. Findings still open after round 2 go to your partner — open findings, what was tried, options, your recommendation — instead of being adjudicated by you. A step or agent that still fails after one retry is reported, never skipped. A code conflict you cannot resolve from the code and the spec is asked about. Rulings on plan ambiguities and conflicts continue as before.
 
 ## Waking After Usage Limits (fork policy, 2026-11-18)
 
-Your human partner runs a scheduled task that wakes sessions stopped by a usage limit ("6시간마다 세션 한도 막혀서 멈춰 있으면 깨우는 스케쥴"). Since 2026-11-19 it checks every hour, reads the reset time from the limit message, and when the reset is still ahead it schedules a one-shot retry (`claude-resume-retry`) three minutes after it: a 6-hourly run at 03:01 woke a session whose limit reset at 03:40, the wake itself hit the limit, and the session stayed stopped for five hours. It wakes only the sessions listed in its list file, so a session that is not listed stays stopped.
+Your human partner runs a scheduled task that wakes sessions stopped by a usage limit. Since 2026-11-19 it checks every hour, reads the reset time from the limit message, and when the reset is still ahead it schedules a one-shot retry (`claude-resume-retry`) three minutes after it: a 6-hourly run at 03:01 woke a session whose limit reset at 03:40, the wake itself hit the limit, and the session stayed stopped for five hours. It wakes only the sessions listed in its list file, so a session that is not listed stays stopped.
 
 The scheduler exists on a machine that has `~/.claude/resume-sessions.json` and `~/.claude/resume-sessions.ps1` (Windows task `claude-resume-sessions`). On such a machine, when you start or take over work that keeps running across hours (an orchestrating session with background subagents, a multi-task plan), make the current session the project's entry:
 
@@ -318,7 +318,7 @@ This is your human partner's fork. When you change a superpowers skill, edit the
 
 ## Design Mockups First (fork policy, 2026-11-10)
 
-Your human partner said "모든 디자인은 클로드 서버에 시안 띄워서 먼저 보여주고 진행하라고 넣어둬". Work that creates or changes something people look at (a screen, layout, component, style, visual design, slide or page) starts with a mockup on claude.ai, before any code, design file or project file for it is written:
+Your human partner asked that every design be shown first as a mockup on the Claude server before the work goes on. Work that creates or changes something people look at (a screen, layout, component, style, visual design, slide or page) starts with a mockup on claude.ai, before any code, design file or project file for it is written:
 
 1. Publish the mockup with the Artifact tool (its description says which type and design skill to load first), build it from the project's real tokens and components when they exist, and give your partner the link. When there are real options, put them side by side on one page.
 2. Stop and wait for an explicit approval of that mockup. A change request means republishing to the same URL and asking again.
@@ -328,7 +328,7 @@ Small visual changes count, and so does visual work inside brainstorming, a plan
 
 ## Analysis Diagrams on claude.ai (fork policy, 2026-11-11)
 
-Your human partner said "특정 구조 등을 분석한 경우, 업무 흐름도와 시스템 아키텍쳐를 자세하게 도식화해서 html로 생성하고, claude 서버에 띄우라고 박아둬".
+Your human partner asked that whenever you analyze how a system is built, you draw its workflow and system architecture in detail as an HTML page and publish it on the Claude server.
 
 **Trigger:** your answer explains how two or more parts of an existing system work together: a module, request or event flow, batch, auth chain, data pipeline, deployment, or an area of a codebase. It applies to a direct ask ("구조 분석해줘", "흐름 파악해줘", "어떻게 돌아가는지 정리해줘") and to the same analysis done inside brainstorming, debugging, review or a subagent's report. A question about a single function or value does not trigger it.
 
@@ -353,7 +353,7 @@ If the Artifact tool is not available, write the same HTML file (under `docs/wor
 
 ## Server Logging (fork policy, 2026-11-12)
 
-Your human partner said "서버에서는 모든 요청,응답에 대한 추적 가능한 로깅을 남기고, 외부 연계(SMS,알림톡,EMAIL,외부APICall) 등 그리고 개인정보(마스킹) 관련해서 추적 가능한 로그를 남기라고 명시해둬".
+Your human partner asked that every server leave traceable logs for every request and response, for every call to an outside service (SMS, KakaoTalk 알림톡, email, external APIs), and for every handling of personal information (masked).
 
 Any server work (HTTP handlers, background jobs, calls to SMS, 알림톡, email, push or external APIs, code that touches personal information) follows **REQUIRED SUB-SKILL: superpowers:writing-traceable-logs**, in design, plan, implementation and review alike. Specs and plans name the request id, call logging, masking and access-record work their change needs. Implementer and reviewer briefs for server code name the skill, because subagents do not see this section.
 
@@ -374,13 +374,14 @@ Using a skill does not mean running every stage at full weight. Before you start
 | Small | One endpoint, column, or flag added to a flow that already exists; roughly ≤600 changed lines; one module family | Bounded: short design in chat → approval → one or two implementer dispatches → one final review |
 | Medium / large | New domain, several apps, security, concurrency, data migration of existing records | Full pipeline |
 
-- **Trivial work stays inline (fork policy, 2026-11-21).** Your human partner said "설계가 필요하지 않고, 확정 후 task를 건너뛰우고 바로 구현해도 되는 간단한 것들은 에이전트한테 맡기지 말고 니가 직접해". A dispatched agent pays a fixed cost that a small fix does not: it rereads the project context, makes a worktree, runs the test harness and opens the PR, so a one-line change takes 10 to 20 minutes and tens of thousands of tokens. Several trivial fixes still go inline, one after another. Work that changes how something looks or plays is not trivial even when the edit is small, because it needs captures and a verdict; it follows its normal path.
+- **Trivial work stays inline (fork policy, 2026-11-21).** Your human partner asked that simple work which needs no design, and which could skip the task step and be implemented right after it is settled, be done by you directly instead of handed to an agent. A dispatched agent pays a fixed cost that a small fix does not: it rereads the project context, makes a worktree, runs the test harness and opens the PR, so a one-line change takes 10 to 20 minutes and tens of thousands of tokens. Several trivial fixes still go inline, one after another. Work that changes how something looks or plays is not trivial even when the edit is small, because it needs captures and a verdict; it follows its normal path.
 - **Trim the always-loaded docs every Monday, Wednesday and Friday (fork policy, 2026-11-21).** On those days the first session trims the project files every session and subagent loads at start (CLAUDE.md, CONTEXT.md and what they @-import, such as `.ai/CLAUDE.md`): one line per rule and routing row, details moved verbatim to a file read on demand (grep the row) or to the design doc. Skip it when the git log already shows a trim commit that day. Your human partner asked for it after a fresh session reached about 100k tokens before any work, a third of it one routing file.
 - **Before a clear or compact, write the hand-off first (fork policy, 2026-11-21).** Trigger: your human partner says they will clear or compact ("clear 할게", "compact 할게"), or you are about to suggest it. Before replying, bring these up to date:
   1. The resume prompt file: the project's `freshPromptFile` in `~/.claude/resume-sessions.json` (none listed: write `~/.claude/resume-<project>-prompt.md`). It holds the running agents (branch, worktree, what is left, desktop folder for the result), PRs merged since the last write, what to launch next in order within the three-agent cap, decisions and quotes from this session not yet in the repo, verdicts waiting on your human partner, and inline work in progress.
   2. The status file Next (`.ai/status/<slug>.md` or the project's equivalent) of any work you did inline, committed and pushed.
   3. Memory: feedback or decisions from this session not yet saved.
   Anything that exists only in the conversation goes into one of the three. Background agents keep running across a clear, but the new context does not know their task ids, so the resume file names each one's branch and worktree. Then reply in one line that it is written, and tell your human partner the first message after the clear: "방금 clear 했으니 이어서 진행해". A session that opens with that message (or "방금 compact 했으니 이어서") reads the resume prompt file named in `~/.claude/resume-sessions.json` for this project first, then follows its first steps.
+- **Recommend clear or compact (fork policy, 2026-11-24).** When your partner signals they want to tidy up the session but does not say which (in any words), write the hand-off above first, then recommend one in a single line with its reason: compact while agents you dispatched are still running, or right after many corrections or decisions on work that continues; clear when a unit of work is done and no agent is running, when the next work is a different topic, or when the weekly usage limit is nearly spent (compaction reads the whole conversation once more).
 - For a small task, recommend the light path in **one** question at the start. Cite the project pipeline's own skip rules if it has them. Do not run the full pipeline without asking.
 - Keep a review on the risky parts only: migrations, auth, transaction boundaries.
 - Merge the base branch before you start, so number collisions (Flyway versions, ids) show up now instead of mid-review.

@@ -107,6 +107,12 @@ Subagent (general-purpose):
       and note it as a concern in your report
     - In existing codebases, follow established patterns. Improve code you're touching
       the way a good developer would, but don't restructure things outside your task.
+    - Before writing a computation other places likely already have (an IK, a grip, a
+      foot plant, a door pass, a limit check, a capture helper), grep for it and use the
+      module the brief names. If the brief names none and you find one that fits, use it.
+      If it would need a special case just for you, or does a different job, build your
+      own and give the reason in one line of your report. If you find two existing copies
+      that disagree, report DONE_WITH_CONCERNS instead of adding a third.
 
     ## When You're in Over Your Head
 

@@ -75,6 +75,7 @@ Subagent (general-purpose):
     - Type safety where applicable?
     - DRY without premature abstraction?
     - Edge cases handled?
+    - Does the change compute something the codebase already computes elsewhere (grep for it)? A second copy with no stated reason is an Important issue; a separate copy whose stated reason holds is fine. A merge that bends a shared module with caller-specific flags is an Important issue too.
 
     **Architecture:**
     - Sound design decisions?

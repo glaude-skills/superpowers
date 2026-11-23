@@ -232,7 +232,7 @@ in this session — not inferred from the diff looking right:
 The full suite is not part of a task's contract. It runs once before the
 final review and again in finishing, never once per task: your human
 partner keeps reviews and test runs to the minimum (fork policy,
-2026-11-10, "리뷰, 테스트는 항상 최소한으로 진행해"). The tests the brief
+2026-11-10). The tests the brief
 names are never skipped.
 
 **REQUIRED SUB-SKILL:** superpowers:verification-before-completion governs
