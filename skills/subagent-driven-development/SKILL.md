@@ -216,8 +216,8 @@ boundaries yourself and do not ask; record each chunk's reason in the
 ledger.
 
 **Keep reviews and test runs minimal (fork policy, 2026-11-10).** Your
-human partner said "리뷰, 테스트는 항상 최소한으로 진행해" (always keep
-reviews and test runs to the minimum). The tests the plan writes and the
+human partner asked that reviews and test runs always be kept to the
+minimum. The tests the plan writes and the
 frozen DoD's criteria already gate every task (RED, GREEN, Gate 2), so a
 review earns its cost only where those tests cannot see the risk:
 
@@ -311,8 +311,8 @@ that implementer. Single-file mechanical fixes also take the cheapest tier.
 
 ## Token Budget (fork policy, 2026-11-15)
 
-Your human partner said "토큰도 너무 잡아 먹는거 같음. 특히 서브에이전트들
-때문에" (this eats too many tokens, above all because of the subagents).
+Your human partner found that sessions spend too many tokens, above all
+on subagents.
 An agent re-reads its whole context on every tool call, so its cost is
 roughly (number of calls) x (average context). A long-lived agent grows
 both, so its cost grows with the square of its lifetime. Measured in one
@@ -373,8 +373,8 @@ judgment, its own tests, or its own review surface. A batch stays under
 the same caps as a run of small tasks (below).
 
 **One implementer for a run of small tasks (fork policy, 2026-11-14).**
-Your human partner said "task마다 그렇게 오래 걸릴 작업은 아닌 것 같은데"
-(no single task is big enough to take that long). A fresh implementer
+Your human partner noticed that no single task was big enough to take as
+long as it did. A fresh implementer
 reads the same instructions, project rules and surrounding code before it
 writes a line, so a small task dispatched alone is mostly start-up. When
 consecutive tasks are each small and edit the same files or the same

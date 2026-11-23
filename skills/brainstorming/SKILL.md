@@ -124,6 +124,10 @@ chat. A new todo-list project is architectural and requires the written
 spec and planning handoffs. Scale the artifact to the selected path;
 complete that path's reviews before implementation.
 
+## Reuse Check (fork policy, 2026-11-23)
+
+Before a design adds behavior that other bodies or places already have (hands, reaching, gait and planted feet, passing doors, catching, a measuring tool), grep for the code that already does it and give the design a short "Reuse" section: for each piece, *reuse* (same computation, only per-body values differ, kept in a table) or *separate* (merging would make the shared module too big, or the direction or feel differs), with a one-line reason. Do not design a mechanism as private to one body when the next body will need the same one, and do not force a merge whose shared module would need a flag per caller.
+
 ## Red Flags
 
 | Thought | Reality |

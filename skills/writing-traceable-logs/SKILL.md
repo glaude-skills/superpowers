@@ -7,7 +7,7 @@ description: Use when writing, changing or reviewing server code that handles HT
 
 ## Overview
 
-Your human partner's standing rule for every server (2026-11-12): "서버에서는 모든 요청,응답에 대한 추적 가능한 로깅을 남기고, 외부 연계(SMS,알림톡,EMAIL,외부APICall) 등 그리고 개인정보(마스킹) 관련해서 추적 가능한 로그를 남기라고 명시해둬".
+Your human partner's standing rule for every server (2026-11-12): leave traceable logs for every request and response, for every call to an outside service (SMS, KakaoTalk 알림톡, email, external APIs), and for every handling of personal information (masked).
 
 One request id links the request, every log line it causes, every outside call it makes and every personal-data access, and no log line holds personal information in the clear. A server change is done only when the four parts below hold for the code it touches.
 

@@ -28,6 +28,7 @@ Before defining tasks, map out which files will be created or modified and what 
 - You reason best about code you can hold in context at once, and your edits are more reliable when files are focused. Prefer smaller, focused files over large ones that do too much.
 - Files that change together should live together. Split by responsibility, not by technical layer.
 - In existing codebases, follow established patterns. If the codebase uses large files, don't unilaterally restructure - but if a file you're modifying has grown unwieldy, including a split in the plan is reasonable.
+- **Reuse before new code (fork policy, 2026-11-23).** For every computation a task adds, grep for an existing one that does the same job. Name it in the task's Files list ("uses `X`"), or write why the task builds a separate one (merging would make it too big, or the job differs in direction or feel). A plan in which two tasks, or a task and existing code, build the same computation without that line fails Self-Review.
 
 This structure informs the task decomposition. Each task should produce self-contained changes that make sense independently.
 

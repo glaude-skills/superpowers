@@ -35,6 +35,7 @@ This is a customized fork of [obra/superpowers](https://github.com/obra/superpow
 
 ### Changelog (fork)
 
+- **fork-v6.4.2.42** (plugin version 6.4.95): 돌려쓰기 확인을 네 곳에 넣었다(brainstorming 의 Reuse Check 절, writing-plans File Structure 의 새 계산마다 기존 것 찾기, implementer-prompt 의 Code Organization, code-reviewer 의 같은 계산 중복 검사). using-superpowers 에 정리 방식(clear 나 compact)을 말하지 않았을 때 한 줄로 권하는 항목을 더했다. 스킬 안에 한국어 원문으로 옮겨 적은 사람의 말 인용은 규칙과 까닭만 남긴 일반 문장으로 바꿨다.
 - **fork-v6.4.2.41** (plugin version 6.4.94): godot-work: headless tests run together in a shared slot with a per-worktree user dir; captures, budgets, clips and exports keep an exclusive slot.
 - **fork-v6.4.2.40** (plugin version 6.4.93): godot-work: small fixes run only the directly touched tests before the PR and the coordinator batches impact tests every two or three small merges; multi-step measurements run as one script with one notice. using-superpowers: feedback bundling up to three, numeric pass criteria for visual feedback, stop a woken old agent before handing over its worktree.
 - **fork-v6.4.2.39** (plugin version 6.4.92): godot-work: waiters poll the heavy lock every 5 seconds and a per-file loop rests 10 seconds after each release, so a waiter is not starved.
