@@ -35,6 +35,7 @@ This is a customized fork of [obra/superpowers](https://github.com/obra/superpow
 
 ### Changelog (fork)
 
+- **fork-v6.4.2.40** (plugin version 6.4.93): godot-work: small fixes run only the directly touched tests before the PR and the coordinator batches impact tests every two or three small merges; multi-step measurements run as one script with one notice. using-superpowers: feedback bundling up to three, numeric pass criteria for visual feedback, stop a woken old agent before handing over its worktree.
 - **fork-v6.4.2.39** (plugin version 6.4.92): godot-work: waiters poll the heavy lock every 5 seconds and a per-file loop rests 10 seconds after each release, so a waiter is not starved.
 - **fork-v6.4.2.38** (plugin version 6.4.91): one plan task per agent with a stop the agent can count (about 200 calls or one merged PR), the coordinator applies the handoff formula on every notification; godot-work takes the heavy lock per test file instead of per batch, and runs the narrow tests first and the whole selection once before the PR.
 - **fork-v6.4.2.37** (plugin version 6.4.90): godot-work: the session too runs only the tests a merge touches (selected by changed paths and class names), and the full suite only before a build for others, once a day when idle, or when the selection passes 70%.
