@@ -15,6 +15,8 @@
 #   6. no dead document path: every backticked `.ai/...md` or `docs/...md` path in
 #      the entry chain (outside code fences, without placeholders such as <slug>)
 #      exists                                                 (fail)
+#   7. every live status file (.ai/status/<slug>.md whose state is not merged or
+#      dropped) stays under the status cap, default 16 KB    (fail)
 #
 # All violations are reported in one run, so nobody fixes one, reruns, and
 # gives up on the gate.
@@ -25,7 +27,7 @@
 # Settings, highest precedence first: command-line flags, then one comment line in
 # the entry file:  <!-- context-check: --max-lines 120 --max-total-kb 48 -->
 #
-# Usage: context-check [--entry FILE] [--max-lines N] [--max-total-kb K] [--exempt PATH]...
+# Usage: context-check [--entry FILE] [--max-lines N] [--max-total-kb K] [--max-status-kb K] [--exempt PATH]...
 # Entry default: CONTEXT.md if it exists, else CLAUDE.md.
 set -euo pipefail
 
@@ -36,6 +38,7 @@ entry=""
 if [ -f CONTEXT.md ]; then entry=CONTEXT.md; elif [ -f CLAUDE.md ]; then entry=CLAUDE.md; fi
 max_lines=120
 max_total_kb=48
+max_status_kb=16
 exempt=" "
 
 parse() {
@@ -44,6 +47,7 @@ parse() {
       --entry) entry=$2; shift 2 ;;
       --max-lines) max_lines=$2; shift 2 ;;
       --max-total-kb) max_total_kb=$2; shift 2 ;;
+      --max-status-kb) max_status_kb=$2; shift 2 ;;
       --exempt) exempt="$exempt$2 "; shift 2 ;;
       *) echo "unknown option: $1" >&2; exit 2 ;;
     esac
@@ -123,6 +127,18 @@ for f in "${chain[@]}"; do
     [ -z "$p" ] && continue
     [ -e "$p" ] || report "$f names \`$p\` — file not found; fix the path or remove the row"
   done < <(body "$f" | grep -oE '`(\.ai|docs)/[^`<>*{}$[:space:]]+\.md`' | tr -d '`' | sort -u || true)
+done
+
+# 7. live status files stay small (read whole on every resume)
+scap=$((max_status_kb * 1024))
+for s in .ai/status/*.md; do
+  [ -f "$s" ] || continue
+  case "$s" in .ai/status/STATUS.md|.ai/status/TASKS.md) continue ;; esac
+  case "$exempt" in *" $s "*) continue ;; esac
+  st=$(tr -d '' < "$s" | grep -m1 -E '^- *state:' || true)
+  case "$st" in *merged*|*dropped*) continue ;; esac
+  sz=$(tr -d '' < "$s" | wc -c)
+  [ "$sz" -le "$scap" ] || report "$s is $((sz / 1024)) KB, cap ${max_status_kb} KB — move old Done lines and long sections verbatim to docs/work/<slug>/log.md"
 done
 
 if [ "$fail" -eq 0 ]; then

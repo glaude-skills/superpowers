@@ -76,6 +76,15 @@ if [[ $CODE -eq 0 ]]; then pass "CRLF entry resolves imports"; else fail "CRLF e
 new_repo; printf '```\n@.ai/fenced.md\n```\n' >> CONTEXT.md; run
 if [[ $CODE -eq 0 ]]; then pass "fenced @ line is not an import"; else fail "fenced @ line is not an import: $OUT"; fi
 
+new_repo; { printf '# t\n- state: in-progress\n'; head -c 17000 /dev/zero | tr '\0' 'x'; } > .ai/status/big.md; run
+if [[ $CODE -eq 1 && $OUT == *".ai/status/big.md is 16 KB, cap 16 KB"* ]]; then pass "live status over cap fails"; else fail "live status over cap fails: $OUT"; fi
+
+new_repo; { printf '# t\n- state: merged abc123\n'; head -c 17000 /dev/zero | tr '\0' 'x'; } > .ai/status/big.md; run
+if [[ $CODE -eq 0 ]]; then pass "merged status over cap passes"; else fail "merged status over cap passes: $OUT"; fi
+
+new_repo; { printf '# t\n- state: in-progress\n'; head -c 17000 /dev/zero | tr '\0' 'x'; } > .ai/status/big.md; run --max-status-kb 32
+if [[ $CODE -eq 0 ]]; then pass "--max-status-kb raises the status cap"; else fail "--max-status-kb raises the status cap: $OUT"; fi
+
 new_repo; printf 's\n' > .ai/status/STATUS.md; git add -A; run
 if [[ $CODE -eq 0 && $OUT == *"WARN: .ai/status/STATUS.md"* ]]; then pass "shared STATUS.md warns"; else fail "shared STATUS.md warns: $OUT"; fi
 
