@@ -35,6 +35,7 @@ This is a customized fork of [obra/superpowers](https://github.com/obra/superpow
 
 ### Changelog (fork)
 
+- **fork-v6.4.2.44** (plugin version 6.4.97): godot-work 의 원형 절을 주 도메인 모듈(사람, 소품, 문, 조명, UI 부품)은 하나 만들고 인스턴스로 돌려쓰는 절로 넓혔다. description 을 Godot 로 게임을 만드는 일 전반으로 넓혔다.
 - **fork-v6.4.2.43** (plugin version 6.4.96): godot-work 에 사람과 쫓는 것은 원형 하나에서 만들고 다음 몸부터 그 모듈을 돌려쓰는 절을 더했다. 몸을 새로 설계하거나 더할 때도 스킬이 걸리도록 description 을 넓혔다.
 - **fork-v6.4.2.42** (plugin version 6.4.95): 돌려쓰기 확인을 네 곳에 넣었다(brainstorming 의 Reuse Check 절, writing-plans File Structure 의 새 계산마다 기존 것 찾기, implementer-prompt 의 Code Organization, code-reviewer 의 같은 계산 중복 검사). using-superpowers 에 정리 방식(clear 나 compact)을 말하지 않았을 때 한 줄로 권하는 항목을 더했다. 스킬 안에 한국어 원문으로 옮겨 적은 사람의 말 인용은 규칙과 까닭만 남긴 일반 문장으로 바꿨다.
 - **fork-v6.4.2.41** (plugin version 6.4.94): godot-work: headless tests run together in a shared slot with a per-worktree user dir; captures, budgets, clips and exports keep an exclusive slot.
