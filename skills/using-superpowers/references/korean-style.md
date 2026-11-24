@@ -1,4 +1,4 @@
-<!-- Moved verbatim from using-superpowers SKILL.md in 6.4.97; only links changed. Its routing row is in ../SKILL.md. -->
+<!-- Moved verbatim from using-superpowers SKILL.md in 6.4.98; only links changed. Its routing row is in ../SKILL.md. -->
 
 ### 한국어 문체: AI 같은 버릇 금지
 

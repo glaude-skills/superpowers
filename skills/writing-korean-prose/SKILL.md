@@ -9,7 +9,7 @@ description: Use when writing Korean that a person will read - commit messages, 
 
 **정본:** 이 스킬의 Base directory 옆 `../using-superpowers/references/korean-style.md`. 파일 전체를 읽고 따른다.
 
-세션 시작 때 들어오는 using-superpowers 에는 부류별 한 줄 요약만 있다(6.4.97 부터). 컨트롤러도 이 세션에서 그 파일을 아직 읽지 않았으면 사람이 읽는 한국어를 쓰기 전에 읽는다. 서브에이전트, 다른 세션에서 넘겨받은 작업도 같다.
+세션 시작 때 들어오는 using-superpowers 에는 부류별 한 줄 요약만 있다(6.4.98 부터). 컨트롤러도 이 세션에서 그 파일을 아직 읽지 않았으면 사람이 읽는 한국어를 쓰기 전에 읽는다. 서브에이전트, 다른 세션에서 넘겨받은 작업도 같다.
 
 ## 쓰기 전에 기억할 것
 

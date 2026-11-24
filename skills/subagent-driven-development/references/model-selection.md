@@ -1,4 +1,4 @@
-<!-- Moved verbatim from subagent-driven-development SKILL.md in 6.4.97; only links changed. Its pointer stays under the same heading in ../SKILL.md. -->
+<!-- Moved verbatim from subagent-driven-development SKILL.md in 6.4.98; only links changed. Its pointer stays under the same heading in ../SKILL.md. -->
 
 ## Model Selection
 

@@ -72,4 +72,4 @@ SKILL.md 상한 9,000자는 hook 이 앞뒤에 붙이는 문구(약 250자)와 �
 ## 8. 스킬에도 같은 원칙
 
 - 자동으로 로딩되는 범위는 작게 두고 상세는 `references/` 로 옮긴다. SKILL.md 에는 절차의 단계와 라우팅 표를 두고, 단계 중간에 드물게 필요한 절(예시, 합리화 표, 모델 선택, 예산 상세)은 문장 그대로 `references/` 로 옮긴다.
-- SKILL.md 가 40 KB 를 넘으면 나눈다. 6.4.97 에서 using-superpowers(54.7 KB)와 subagent-driven-development(47.2 KB)를 나눴다.
+- SKILL.md 가 40 KB 를 넘으면 나눈다. 6.4.98 에서 using-superpowers(54.7 KB)와 subagent-driven-development(47.2 KB)를 나눴다.

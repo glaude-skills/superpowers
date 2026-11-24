@@ -1,4 +1,4 @@
-<!-- Moved verbatim from using-superpowers SKILL.md in 6.4.97; only links changed. Its routing row is in ../SKILL.md. -->
+<!-- Moved verbatim from using-superpowers SKILL.md in 6.4.98; only links changed. Its routing row is in ../SKILL.md. -->
 
 ## Subagents and Stop Points (fork policy, 2026-11-11)
 
