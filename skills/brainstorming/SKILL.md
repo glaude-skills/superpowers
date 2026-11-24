@@ -59,7 +59,7 @@ allowed while those prerequisites remain incomplete.
 
 Before classifying, look for this topic's work directory, `docs/work/<slug>/`
 (`<slug>` is the branch slug), and its status file `.ai/status/<slug>.md`
-(using-superpowers, Work Records). Only read — `ls` and `cat`. The status
+(`../using-superpowers/references/work-records.md`). Only read — `ls` and `cat`. The status
 file's `## Next` names the interrupted stage; trust it and `git log` over your
 recollection. Two axes decide: does the directory exist, and is the request
 inside the scope already agreed?
@@ -155,17 +155,17 @@ your path and complete them in order.
 **Bounded:**
 1. **Explore project context** — check files, docs, recent commits
 2. **Ask clarifying questions** — one at a time, the ones that matter
-3. **Present short design in chat** — approach, files touched, testing. Visual work also gets its claude.ai mockup here (using-superpowers, Design Mockups First), and the approval in step 4 covers it
+3. **Present short design in chat** — approach, files touched, testing. Visual work also gets its claude.ai mockup here (`../using-superpowers/references/design-mockups.md`), and the approval in step 4 covers it
 4. **Get approval** — STOP and wait for an explicit yes; presenting the design and starting in the same breath is skipping the gate
 5. **Implement** — proceed with the normal development workflow (TDD applies); no plan document
 
 **Architectural:**
-1. **Explore project context** — check files, docs, recent commits, and the project's `.ai/` policy folder (create `.ai/` if the project root lacks one — see using-superpowers)
-2. **Show designs as claude.ai mockups**: the first time a screen, layout, component or style is on the table, publish a mockup with the Artifact tool and give the link, with no offer message first (using-superpowers, Design Mockups First). When exploring the project means analyzing how an existing structure works, publish its 업무 흐름도 and 시스템 아키텍처 page the same way (using-superpowers, Analysis Diagrams on claude.ai). For other visual questions such as a proposed architecture, offer the visual companion just-in-time as before, in its own message. See the Visual Companion section below.
+1. **Explore project context** — check files, docs, recent commits, and the project's `.ai/` policy folder (create `.ai/` if the project root lacks one — see `../using-superpowers/references/project-policy.md`)
+2. **Show designs as claude.ai mockups**: the first time a screen, layout, component or style is on the table, publish a mockup with the Artifact tool and give the link, with no offer message first (`../using-superpowers/references/design-mockups.md`). When exploring the project means analyzing how an existing structure works, publish its 업무 흐름도 and 시스템 아키텍처 page the same way (`../using-superpowers/references/analysis-diagrams.md`). For other visual questions such as a proposed architecture, offer the visual companion just-in-time as before, in its own message. See the Visual Companion section below.
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Write design doc** — save to `docs/work/<slug>/design.md` (`<slug>` = branch slug; the plan, DoD, and understanding doc join it there), create or update `.ai/status/<slug>.md` (state, `## Next`, decisions so far — using-superpowers, Work Records), and commit both
+6. **Write design doc** — save to `docs/work/<slug>/design.md` (`<slug>` = branch slug; the plan, DoD, and understanding doc join it there), create or update `.ai/status/<slug>.md` (state, `## Next`, decisions so far — `../using-superpowers/references/work-records.md`), and commit both
 7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 8. **Adversarial design review (Claude subagent)** — dispatch a fresh subagent — the project's spec or design review agent if it has one, else `general-purpose` — with [spec-document-reviewer-prompt.md](spec-document-reviewer-prompt.md) to challenge the design before the user gate; fix the findings inline (see below)
 9. **User reviews written spec** — ask user to review the spec file before proceeding
@@ -314,7 +314,7 @@ This is a hard gate. Wait for the user's **explicit** confirmation — do not pr
 
 ## Visual Companion
 
-**Fork policy (2026-11-10):** design mockups, wireframes and layout options are published to claude.ai with the Artifact tool, without an offer message (using-superpowers, Design Mockups First). This local companion covers designs only in a session without the Artifact tool, and stays available for other visual questions such as a proposed architecture (diagrams of an existing structure you analyzed go to claude.ai under Analysis Diagrams on claude.ai); the offer and per-question rules below apply to those uses.
+**Fork policy (2026-11-10):** design mockups, wireframes and layout options are published to claude.ai with the Artifact tool, without an offer message (`../using-superpowers/references/design-mockups.md`). This local companion covers designs only in a session without the Artifact tool, and stays available for other visual questions such as a proposed architecture (diagrams of an existing structure you analyzed go to claude.ai under `../using-superpowers/references/analysis-diagrams.md`); the offer and per-question rules below apply to those uses.
 
 A browser-based companion for showing mockups, diagrams, and visual options during brainstorming. Available as a tool — not a mode. Accepting the companion means it's available for questions that benefit from visual treatment; it does NOT mean every question goes through the browser.
 

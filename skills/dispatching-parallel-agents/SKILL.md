@@ -13,7 +13,7 @@ When you have multiple unrelated failures (different test files, different subsy
 
 **Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
 
-**Parallel saves time, not tokens (fork policy, 2026-11-15).** N agents side by side cost what N agents in sequence cost, and every agent re-reads its whole context on every call. Dispatch in parallel only when the wall-clock time matters, and keep each agent short-lived with a narrow prompt (superpowers:subagent-driven-development, Token Budget).
+**Parallel saves time, not tokens (fork policy, 2026-11-15).** N agents side by side cost what N agents in sequence cost, and every agent re-reads its whole context on every call. Dispatch in parallel only when the wall-clock time matters, and keep each agent short-lived with a narrow prompt (superpowers:subagent-driven-development `../subagent-driven-development/references/token-budget.md`).
 
 **At most three agents running at once (fork policy, 2026-11-19).** Count every agent of the session that has not finished: new dispatches, resumed ones, and agents waiting on their own background job. When three are running, queue the next task until one finishes. This holds after a usage limit resets too: resume at most three of the stopped agents and keep the rest queued. Agents do not dispatch their own subagents; say so in the brief. One session ran more than eight side by side and the token use jumped; another resumed five at once after a limit reset.
 

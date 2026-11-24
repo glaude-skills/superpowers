@@ -146,8 +146,7 @@ and the new one resumes from the same ledger.
   `# SDD ledger — plan: <plan file path>`.
 - `git clean -fdx` will destroy the workspace (it's git-ignored scratch);
   if that happens, recover from `git log`.
-- **The ledger never travels; the status file does** (using-superpowers, Work
-  Records). Each `Task <N>: complete` line and each `Ruling:` line also goes
+- **The ledger never travels; the status file does** (`../using-superpowers/references/work-records.md`). Each `Task <N>: complete` line and each `Ruling:` line also goes
   into `.ai/status/<slug>.md` (`## Done` / `## Decisions`, and `## Next` set to
   the following task), in the same commit as the work. With no ledger but a
   status file — another machine, a wiped workspace — rebuild the ledger from
@@ -257,8 +256,7 @@ Run `../subagent-driven-development/scripts/review-package PLAN_FILE MERGE_BASE 
 `git merge-base main HEAD`) and review from the file it prints.
 
 **With a subagent tool:** dispatch the project's code-review agent if it
-has one, else a `general-purpose` reviewer (using-superpowers, Subagents and
-Stop Points) — the whole-branch review is a judgment task — using
+has one, else a `general-purpose` reviewer (`../using-superpowers/references/subagents.md`) — the whole-branch review is a judgment task — using
 superpowers:requesting-code-review's
 [code-reviewer.md](../requesting-code-review/code-reviewer.md), with the
 package path, the plan and spec paths, the plan's Review Focus section

@@ -35,6 +35,7 @@ This is a customized fork of [obra/superpowers](https://github.com/obra/superpow
 
 ### Changelog (fork)
 
+- **fork-v6.4.2.45** (plugin version 6.4.98): using-superpowers 를 상시 로딩 핵심(7,143자)과 `references/` 13개 파일로 나눴다. 세션 시작 hook 출력이 Claude Code 상한 10,000자를 넘어 앞 2,000자만 전달되던 문제를 고쳤고, 핵심에는 언어 원칙, 한국어 문체 부류별 한 줄, 라우팅 표(16행), 상시 로딩 법칙만 남겼다. 상시 로딩 법칙의 상세는 `references/context-budget.md` 에 두었다. hook 은 상한을 넘으면 맨 앞에 경고를 붙이고 스킬 폴더 경로를 함께 넣는다. subagent-driven-development(47.2 KB)도 같은 방식으로 나눴고, `context-check` 에 죽은 문서 경로 검사를, 테스트에 스킬 크기와 hook 출력 상한 검사를 더했다.
 - **fork-v6.4.2.44** (plugin version 6.4.97): godot-work 의 원형 절을 주 도메인 모듈(사람, 소품, 문, 조명, UI 부품)은 하나 만들고 인스턴스로 돌려쓰는 절로 넓혔다. description 을 Godot 로 게임을 만드는 일 전반으로 넓혔다.
 - **fork-v6.4.2.43** (plugin version 6.4.96): godot-work 에 사람과 쫓는 것은 원형 하나에서 만들고 다음 몸부터 그 모듈을 돌려쓰는 절을 더했다. 몸을 새로 설계하거나 더할 때도 스킬이 걸리도록 description 을 넓혔다.
 - **fork-v6.4.2.42** (plugin version 6.4.95): 돌려쓰기 확인을 네 곳에 넣었다(brainstorming 의 Reuse Check 절, writing-plans File Structure 의 새 계산마다 기존 것 찾기, implementer-prompt 의 Code Organization, code-reviewer 의 같은 계산 중복 검사). using-superpowers 에 정리 방식(clear 나 compact)을 말하지 않았을 때 한 줄로 권하는 항목을 더했다. 스킬 안에 한국어 원문으로 옮겨 적은 사람의 말 인용은 규칙과 까닭만 남긴 일반 문장으로 바꿨다.

@@ -29,8 +29,7 @@ operation; a security-sensitive action; a side effect outside this worktree
 that norms say you ask about first (a merge into the base branch, a push to a
 shared branch, a publish); a plan so broken that every path forward is a
 guess; a review fix loop with findings still open after round 2; and a step
-or agent that still fails after one retry (using-superpowers, Subagents and
-Stop Points). For those, stop and ask. Pushing the feature branch and opening its
+or agent that still fails after one retry (`../using-superpowers/references/subagents.md`). For those, stop and ask. Pushing the feature branch and opening its
 PR/MR at the end is not one of them: finishing-a-development-branch does that
 by default, and the PR/MR is where your human partner approves the merge.
 
@@ -60,7 +59,7 @@ digraph when_to_use {
 - Costs a fresh context per task and per review; inline costs one context plus one final reviewer
 - Both run in this session, share the same plan workspace and ledger, and never pause between tasks
 
-**Small plans run light.** When the plan has three or fewer tasks, or its tasks touch the same module one after another, do not dispatch an implementer and a task reviewer per task. Use one final whole-branch review. Share one implementer across the plan only within the Token Budget cap (a few dozen calls in all, no images); otherwise a fresh implementer per task still costs less than one long-lived context. executing-plans inline is the other light option. Per-task review seats pay off when tasks are independent or risky. On a small plan they multiply dispatches without catching more (see using-superpowers, "Scale the Process to the Task").
+**Small plans run light.** When the plan has three or fewer tasks, or its tasks touch the same module one after another, do not dispatch an implementer and a task reviewer per task. Use one final whole-branch review. Share one implementer across the plan only within the Token Budget cap (a few dozen calls in all, no images); otherwise a fresh implementer per task still costs less than one long-lived context. executing-plans inline is the other light option. Per-task review seats pay off when tasks are independent or risky. On a small plan they multiply dispatches without catching more (see `../using-superpowers/references/scale-process.md`).
 
 ## The Process
 
@@ -157,8 +156,7 @@ a ledger file, not only in todos.
   trust the ledger and `git log` over your own recollection.
 - `git clean -fdx` will destroy the workspace (it's git-ignored scratch); if
   that happens, recover from `git log`.
-- **The ledger never travels; the status file does** (using-superpowers, Work
-  Records). Each `Task <N>: complete` line and each `Ruling:` line also goes
+- **The ledger never travels; the status file does** (`../using-superpowers/references/work-records.md`). Each `Task <N>: complete` line and each `Ruling:` line also goes
   into `.ai/status/<slug>.md` (`## Done` / `## Decisions`, and `## Next` set to
   the following task), in the same commit as the work. With no ledger but a
   status file — another machine, a wiped workspace — rebuild the ledger from
@@ -269,97 +267,11 @@ Wherever the steps below say "task review", read "chunk review".
 
 ## Model Selection
 
-**Do not pass a `model` argument** (using-superpowers, Subagents and Stop
-Points): the dispatched agent's definition decides. The guidance below is for
-writing those definitions, and for the dispatches where your partner asks
-you to choose.
-
-Use the least powerful model that can handle each role to conserve cost and increase speed.
-
-**Mechanical implementation tasks** (isolated functions, clear specs, 1-2 files): use a fast, cheap model. Most implementation tasks are mechanical when the plan is well-specified.
-
-**Integration and judgment tasks** (multi-file coordination, pattern matching, debugging): use a standard model.
-
-**Architecture and design tasks**: use the most capable available model.
-The final whole-branch review is one of these — dispatch it on the most
-capable available model, not the session default.
-
-**Review tasks**: choose the model with the same judgment, scaled to the
-diff's size, complexity, and risk. A small mechanical diff does not need the
-most capable model; a subtle concurrency change does. Scoped re-reviews of
-small fix diffs take a cheap-to-mid tier.
-
-**Fix-loop round 2**: a fresh implementer; one tier above the one that got
-stuck only when a project agent definition offers it or your partner names it.
-
-**An omitted model follows the agent definition.** A `general-purpose`
-dispatch inherits your session's model; when that cost matters, the fix is an
-agent definition with its own `model:`, not a per-call override.
-
-**Turn count beats token price.** Wall-clock and context cost scale with how
-many turns a subagent takes, and the cheapest models routinely take 2-3× the
-turns on multi-step work — costing more overall. Use a mid-tier model as the
-floor for reviewers and for implementers working from prose descriptions.
-When the task's plan text contains the complete code to write, the
-implementation is transcription plus testing: use the cheapest tier for
-that implementer. Single-file mechanical fixes also take the cheapest tier.
-
-**Task complexity signals (implementation tasks):**
-- Touches 1-2 files with a complete spec → cheap model
-- Touches multiple files with integration concerns → standard model
-- Requires design judgment or broad codebase understanding → most capable model
+Moved to `references/model-selection.md`. Read it before you pick a model for a dispatch or write an agent definition.
 
 ## Token Budget (fork policy, 2026-11-15)
 
-Your human partner found that sessions spend too many tokens, above all
-on subagents.
-An agent re-reads its whole context on every tool call, so its cost is
-roughly (number of calls) x (average context). A long-lived agent grows
-both, so its cost grows with the square of its lifetime. Measured in one
-real session: one implementer given three tasks made 329 tool calls and
-read about 107M cached tokens, about 320k of context per call, because
-every screenshot it opened stayed in its context; that one agent was
-about half of what all ten of the session's subagents cost together. A
-verifier waiting on a background test checked its status 108 times.
-Three agents ran heavy jobs side by side (full suite, GPU frame timing,
-window captures): six processes overlapped, the timing failed falsely,
-and it had to be measured again.
-
-These rules bind you and go into every dispatch (the templates carry the
-ones a subagent keeps):
-
-- **Lifetime.** One fresh agent per task is the default, and it ends at
-  its commit: never hand a finished implementer its next task. Several
-  small tasks share one implementer only under the caps in The Task Loop.
-- **Narrow brief.** A dispatch carries the task brief, the files to
-  change, and the acceptance criteria. Never make an agent read the whole
-  plan or a whole design document: copy the section the task needs into
-  the dispatch, or name it by heading.
-- **Waiting on a command.** Run a long command (suite, build, export) in
-  the foreground with a timeout long enough for it to finish, and take
-  its result once. Never start it in the background and check its status
-  in a loop: every check is a call that re-reads the whole context. When
-  it must run in the background, wait for its completion notification
-  and nothing else.
-- **Images.** An image an agent opens stays in its context and is re-read
-  on every later call. Open only the few a verdict needs. When many must
-  be looked at, dispatch a short-lived agent that only looks at those
-  images and returns one verdict line per image, or hand them to your
-  partner.
-- **Heavy jobs one at a time.** A full suite, a build, a GPU or frame-time
-  measurement, and a capture that opens a window run one at a time across
-  all agents, yours included: overlapping them slows each one and makes
-  measurements fail falsely. What runs side by side is light: reading,
-  writing code and docs, selected tests. The full suite beside a reading
-  reviewer (Review Chunks) is one heavy job and one light one, which this
-  allows. Running agents side by side saves time, never tokens.
-- **Review by risk.** One review at the end of the plan is the default; a
-  chunk gets its own review only for the risks Review Chunks names. A
-  re-review runs only for an operational defect (The fix loop).
-- **The controller's share.** A merge, one status-file line, a check that
-  takes a few calls: do it yourself instead of dispatching. A dispatched
-  agent pays its start-up reading before its first useful call. Fixing
-  review findings is not in this share (The fix loop).
+Moved to `references/token-budget.md`. Read it before you write the first brief of a plan: its rules (lifetime, narrow brief, waiting on a command, images, heavy jobs one at a time, review by risk, the controller's share) go into every dispatch.
 
 ## The Task Loop
 
@@ -549,7 +461,7 @@ with it. A finding you cannot write that line for is a check defect (a
 test, wording, structure): its fix is checked by the covering tests in the
 fix report and by the final whole-branch review, not by a re-review. Two
 rounds maximum per chunk, and round 2 runs only when the re-review leaves
-a finding open (using-superpowers, Subagents and Stop Points). When the
+a finding open (`../using-superpowers/references/subagents.md`). When the
 project sets its own cap or counting rule for review chains, apply it as
 well; the loop stops at whichever cap comes first.
 
@@ -677,89 +589,8 @@ Use superpowers:finishing-a-development-branch.
 
 ## Common Rationalizations
 
-| Excuse | Reality |
-|--------|---------|
-| "Close enough on spec compliance" | Reviewer found spec gaps = not done. Fix, or hit the cap and escalate — those are the only exits. |
-| "I'll fix it myself, dispatching is overhead" | Controller fixes pollute your context and skip review. Resume the implementer. |
-| "One more round will converge" | Past the cap, rounds don't converge — the failure is structural. Escalate to your partner. |
-| "The reviewer will just find something new anyway" | Scoped re-reviews verify fixes; they cannot wander. New findings on untouched code go to the ledger, not the loop. |
-| "This finding is obviously wrong, I'll drop it" | At the cap your partner decides, and every decision is a ledger entry. Silent discards are forbidden. |
-| "The fix was small, skip the re-review" | Size is not the test. A round that fixes an operational defect ends with a scoped re-review, however small the fix; a round of check defects only is checked by its covering tests. |
-| "Re-review everything, to be safe" | A re-review re-reads the diff at full cost. If you cannot write in one line how the finding reaches users or operations, it is a check defect and its covering tests are the check. |
-| "Reviews slow the loop down" | The loop without reviews is just unverified churn. Reviews are the loop's brakes and steering. |
-| "Ledger bookkeeping is overhead" | The ledger is what survives compaction. Controllers without one have re-dispatched entire completed task sequences. |
-| "The implementer spawned its own reviewer — free extra assurance" | It's a duplicate seat reviewing the same diff; the task review is the gate. A worker-spawned reviewer is a defect to flag, not rigor. |
-| "Every task deserves its own fresh implementer" | A small task dispatched alone is mostly start-up reading. A short run of small tasks on the same files shares one implementer; each task keeps its own tests and commit. |
-| "This implementer already knows the code, give it the next task too" | Its every later call re-reads everything it has seen. Past a few dozen calls, or once it has opened images, a fresh implementer is cheaper than its start-up. |
-| "The chunk's last implementer can run the full suite" | That holds the loop for the suite's whole duration. Run it yourself while the reviewer reads. |
-| "I'll start it in the background and check on it" | Every check re-reads the whole context; one verifier checked 108 times. Foreground with a timeout, or wait for the completion notification. |
-| "Let me look at all the captures myself" | Each image stays in context for every later call. Open the few a verdict needs; give the rest to a short image-only agent or to your partner. |
-| "Run the suite, the build and the captures in parallel to save time" | Heavy jobs run one at a time. Overlapped, they slow each other and the measurements fail falsely; parallel agents save time, never tokens. |
-| "I'll update `.ai/` later, in one pass" | A commit touching routes, data model, conventions, or progress without its `.ai/` update is incomplete. Same commit, every time. |
+Moved to `references/common-rationalizations.md`. Read it when you are tempted to skip a review, fix findings yourself, or extend an agent's life.
 
 ## Example Workflow
 
-```
-You: I'm using Subagent-Driven Development to execute this plan.
-
-[Setup: worktree verified]
-[Read plan file once: docs/superpowers/plans/feature-plan.md]
-[Resolve workspace: bash scripts/sdd-workspace docs/superpowers/plans/feature-plan.md — no ledger inside, fresh start]
-[Create todos for all tasks]
-
-Task 1: Hook installation script
-
-[Run task-brief for Task 1; dispatch implementer with brief + report paths + context]
-
-Implementer: "Before I begin - should the hook be installed at user or system level?"
-
-You: "User level (~/.config/superpowers/hooks/)"
-
-Implementer: [Later]
-  - Implemented install-hook command
-  - Added tests, 5/5 passing
-  - Self-review: Found I missed --force flag, added it
-  - Committed
-
-[Run review-package PLAN_FILE BASE HEAD; dispatch task reviewer with the printed path]
-Task reviewer: Spec ✅ - all requirements met, nothing extra.
-  Strengths: Good test coverage, clean. Issues: None. Task quality: Approved.
-
-[Ledger: Task 1: complete (commits a1b2c3d..d4e5f6a, review clean)]
-
-Task 2: Recovery modes
-
-[Run task-brief for Task 2; dispatch implementer with brief + report paths + context]
-
-Implementer: [No questions]
-  - Added verify/repair modes
-  - 8/8 tests passing
-  - Committed
-
-[Run review-package PLAN_FILE BASE HEAD; dispatch task reviewer with the printed path]
-Task reviewer: Spec ❌:
-  - Missing: Progress reporting (spec says "report every 100 items")
-  Issues (Important): Magic number (100)
-
-[Fix round 1: resume the implementer with both findings]
-Implementer: Added progress reporting, extracted PROGRESS_INTERVAL constant.
-  Re-ran test/recovery.test.js — 10/10 passing. Fix report appended.
-
-[Run review-package PLAN_FILE FIX_BASE HEAD; dispatch scoped re-review]
-Re-reviewer: Missing progress reporting — ADDRESSED (src/recovery.js:41).
-  Magic number — ADDRESSED (src/recovery.js:7). New breakage: none.
-  Verdict: all findings addressed.
-
-[Ledger: Task 2: fix round 1/2 (2 addressed, 0 open; commits d4e5f6a..b7c8d9e)]
-[Ledger: Task 2: complete (commits d4e5f6a..b7c8d9e, review clean)]
-
-...
-
-[After all tasks]
-[Run review-package PLAN_FILE MERGE_BASE HEAD; dispatch final code-reviewer (project agent, its own model)]
-Final reviewer: All requirements met. Deferred minors triaged: none block merge.
-
-[Delete this plan's workspace — the record now lives in git]
-
-Done! Using superpowers:finishing-a-development-branch.
-```
+Moved to `references/example-workflow.md`: one plan run end to end, from setup to finishing the branch.
