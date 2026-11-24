@@ -1,18 +1,19 @@
 ---
 name: godot-work
-description: Use when working in a Godot project - running its tests, captures, imports, exports or editor tools, dispatching agents that will run Godot, deciding when to run the full test suite, or designing or adding a character, enemy, chaser or any other body that moves
+description: Use when developing a game in a Godot project - designing or building scenes, characters, props, levels or UI, writing scripts, running tests, captures, imports, exports or editor tools, dispatching agents that will run Godot, or deciding when to run the full test suite
 ---
 
 # Godot 작업 규칙
 
-Godot 를 돌리는 일(테스트, 캡처, 가져오기, 내보내기, 영상 뽑기, Blender 굽기처럼 GPU 와 CPU 를 오래 쓰는 일)의 규칙이다. 세션과 서브에이전트 모두 따르고, 에이전트에게 Godot 일을 맡길 때는 브리프에 이 스킬을 적는다.
+Godot 로 게임을 만드는 일의 규칙이다. 첫 절은 무엇을 만들든 지키는 모듈 돌려쓰기이고, 나머지 절은 Godot 를 돌리는 일(테스트, 캡처, 가져오기, 내보내기, 영상 뽑기, Blender 굽기처럼 GPU 와 CPU 를 오래 쓰는 일)의 규칙이다. 세션과 서브에이전트 모두 따르고, 에이전트에게 Godot 일을 맡길 때는 브리프에 이 스킬을 적는다.
 
-## 사람과 쫓는 것은 원형 하나에서 (fork policy, 2026-11-24)
+## 주 도메인 모듈은 하나 만들고 돌려쓴다 (fork policy, 2026-11-24)
 
-- 사람, 적, 쫓는 것처럼 움직이는 몸이 여럿 나오는 게임은 첫 몸을 원형(프로토타입)으로 만들고, 다음 몸부터는 그 원형의 모듈을 돌려쓴다. 몸 만들기(뼈대, 체형, 굽기), 손과 팔 IK, 걸음과 디딘 발, 길 걷기와 문 지나기, 잡는 차례처럼 몸마다 되풀이되는 셈은 원형 모듈에 두고, 몸마다 다른 값(키, 체형, 속도, 소리 큐, 잡는 꼴)은 표의 한 줄과 칸으로만 더한다. 사람 id 로 분기하지 않는다
-- 새 몸을 더하는 설계와 계획은 원형에서 그대로 쓰는 모듈과 표에 더할 칸부터 적는다. 원형에 없는 동작이 필요하면 원형 모듈에 더해 기존 몸에서도 돌게 하고, 기존 몸의 테스트와 캡처로 깨지지 않았는지 본다
-- 캐릭터를 만드는 판단(쫓기와 수색 판단, 고개 돌리기)이나 결이 다른 동작, 묶으면 호출하는 쪽마다 플래그가 필요한 것은 몸마다 따로 두고 까닭을 설계에 한 줄 적는다(superpowers:brainstorming 의 Reuse Check)
-- 까닭: 몸마다 따로 짠 셈은 한 몸에서 고친 버그(발 미끄러짐, 벽이나 몸 관통, 손가락 관통)가 다른 몸에 그대로 남고, 같은 수정을 몸 수만큼 되풀이한다. 원형을 먼저 만들고 돌려쓰는 것이 게임 안정성에 크게 닿는다는 것을 경민님이 개발하면서 직접 확인했다(2026-11-24)
+- 게임에 여러 번 나오는 것(사람과 적, 의자와 책상 같은 소품, 문, 조명, 창, 화면 UI 부품)은 처음 만들 때 그 종류의 모듈 하나(씬이나 만드는 함수)로 만들고, 다음부터는 그 모듈을 복사해 놓듯 인스턴스로 배치한다. 의자가 열 개 필요하면 의자 하나를 만들고 열 번 놓는다. 같은 것을 자리마다 새로 짜지 않는다
+- 보이는 쪽일수록 더 지킨다. 모양, 재질, 크기, 손이 닿는 자리, 충돌 모양은 모듈 한 곳에서 정하고, 자리마다 다른 값(위치, 돌림, 색, 낡은 정도, 사람의 키와 체형과 속도)은 인자나 표의 칸으로만 넘긴다. 사람 id 나 자리 이름으로 분기하지 않는다
+- 새 것을 만들기 전에 같은 종류의 모듈이 이미 있는지 grep 한다. 있으면 그것을 쓰고, 모자라면 그 모듈에 칸을 더해 기존 배치에서도 그대로 도는지 테스트와 캡처로 본다. 설계와 계획에는 쓸 모듈과 더할 칸을 적는다
+- 몸마다 되풀이되는 셈(손과 팔 IK, 걸음과 디딘 발, 문 지나기, 잡는 차례)도 같다. 캐릭터를 만드는 판단(쫓기와 수색 판단)이나 결이 다른 동작, 묶으면 호출하는 쪽마다 플래그가 필요한 것은 따로 두고 까닭을 한 줄 적는다(superpowers:brainstorming 의 Reuse Check)
+- 까닭: 자리마다 따로 만든 것은 한 곳에서 고친 결함(크기, 관통, 손이 닿는 자리, 재질)이 다른 곳에 그대로 남고, 같은 수정을 개수만큼 되풀이한다. 주 도메인 모듈을 먼저 만들고 돌려쓰는 것이 게임 안정성에 크게 닿는다는 것을 경민님이 개발하면서 직접 확인했다(2026-11-24)
 
 ## 무거운 일은 하나씩
 
