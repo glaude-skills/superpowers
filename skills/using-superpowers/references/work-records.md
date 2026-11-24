@@ -22,7 +22,7 @@ Your human partner asked that all working documents be written and kept current 
 ## Next
 <the exact next action — command, file, or question — so a new session starts on it without asking>
 ## Done
-- <task or step>: <commit sha> (<verification and its result>)
+- <task or step>: <commit sha> (<verdict in one clause>)
 ## Decisions
 - <decision or Ruling>: <why> (<who decided, date>)
 ## Open
@@ -30,6 +30,8 @@ Your human partner asked that all working documents be written and kept current 
 ## Links
 - docs/work/<slug>/design.md · plan.md · dod.md
 ```
+
+**Keep it under 16 KB (fork policy, 2026-11-24).** It is read whole on every resume, so it holds the current state, not the history. One line per Done item (task, sha, verdict) and per Decision (the ruling, who, when; details in the design doc). Capture comparisons, mock play notes, measurements and the story of how a task went belong in `docs/work/<slug>/log.md`, linked from `## Links`. When the file passes 16 KB, move the oldest Done lines and any long section verbatim to that log. `scripts/context-check` fails on a live status file (state not `merged` or `dropped`) over the cap. Measured in one project: live status files had grown to 28 to 96 KB, mostly capture notes and long Done entries, and each resume read them whole.
 
 Update it at every stopping point — a commit, a finished task, a ruling, a question asked, a pause, before the turn ends — and commit it with the work it describes. Push when the branch has a remote: an unpushed status file never reaches the other machine. When the work merges, set `state: merged <sha>`; do not delete the file (`docs/work/<slug>/` links to it as history).
 

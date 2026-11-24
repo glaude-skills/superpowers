@@ -64,10 +64,10 @@ Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it h
 | 사람이 읽는 한국어를 쓴다 | `references/korean-style.md` | 부류별 표 전체를 따른다. 서브에이전트 브리프에는 `superpowers:writing-korean-prose` 를 적는다 |
 | 사람에게 결정을 묻는다 | `references/asking-questions.md` | 질문마다 대상과 현재 상태, 선택지별 결과, 권고와 까닭, 답이 없을 때 할 일을 넣고 한 번에 셋까지만 묻는다 |
 | 프로젝트 첫 접촉, 진입 파일이나 `.ai/` 수정 | `references/project-policy.md` | `.ai/` 가 없으면 먼저 만든다. 진입 파일이나 `.ai/` 를 고친 커밋 전에 `scripts/context-check` 를 돌린다 |
-| 작업 시작, 커밋, 멈춤, 세션 재개 | `references/work-records.md` | 진행 상태는 `.ai/status/<slug>.md` 에 쓰고 작업과 함께 커밋, push 한다. 재개할 때는 그 파일과 `git log` 를 먼저 읽고 `## Next` 부터 시작한다. 할 일 목록과 플러그인 메모리는 기록이 아니다 |
+| 작업 시작, 커밋, 멈춤, 세션 재개 | `references/work-records.md` | 진행 상태는 `.ai/status/<slug>.md` 에 16 KB 안으로 쓰고(경과는 `docs/work/<slug>/log.md`) 작업과 함께 커밋, push 한다. 재개할 때는 그 파일과 `git log` 를 먼저 읽고 `## Next` 부터 시작한다. 할 일 목록과 플러그인 메모리는 기록이 아니다 |
 | 에이전트 디스패치, 실행 중인 에이전트 보고 | `references/subagents.md` | 디스패치마다 표에서 고른 `model` 과 `effort` 를 넘기고 사용자에게 "opus high" 처럼 알린다. 에이전트 하나에 계획 태스크 하나, 브리프에 셀 수 있는 정지 조건(약 200 호출)을 쓴다 |
 | 리뷰 수정 루프, 재시도해도 실패한 단계 | `references/subagents.md` | 리뷰 수정은 두 라운드까지 하고 남은 지적은 사용자에게 넘긴다. 실패한 단계는 건너뛰지 않고 보고한다 |
-| 정리, 마무리, clear, compact 신호 | `references/session-handoff.md` | 답하기 전에 재개 프롬프트 파일, 상태 파일 `## Next`, 메모리를 먼저 갱신한다. 방식을 말하지 않았으면 clear 와 compact 중 하나를 까닭과 함께 한 줄로 권한다 |
+| 정리, 마무리, clear, compact 신호, 조정 세션의 머지와 디스패치와 결정 | `references/session-handoff.md` | 재개 프롬프트 파일은 통째로 덮어쓰고 8 KB 안에 둔다. 답하기 전에 재개 프롬프트 파일, 상태 파일 `## Next`, 메모리를 먼저 갱신한다. 방식을 말하지 않았으면 clear 와 compact 중 하나를 까닭과 함께 한 줄로 권한다 |
 | 세션이 "방금 clear 했으니 이어서" 로 시작 | `references/session-handoff.md` | 이 프로젝트의 재개 프롬프트 파일을 먼저 읽고 그 첫 단계를 따른다 |
 | 몇 시간 이어지는 작업 시작, 사용 한도 후 재개 | `references/usage-limit-wake.md` | 깨우기 목록 파일이 있는 머신이면 이 세션을 프로젝트 항목으로 등록하고 사용자에게 한 줄로 알린다 |
 | superpowers 스킬 수정 | `references/editing-skills.md` | 포크 클론을 고치고 활성 캐시에 복사한 뒤, 버전 3곳과 README 이력을 올려 같은 턴에 push 하고 PR 로 `main` 에 넣는다 |
