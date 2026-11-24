@@ -7,7 +7,7 @@ code quality.
 **Purpose:** Verify one task's implementation matches its requirements (nothing
 more, nothing less) and is well-built (clean, tested, maintainable)
 
-Dispatch the project's agent for this role from `.claude/agents/` when one exists, with this as its prompt; `general-purpose` only when none does (using-superpowers, Subagents and Stop Points).
+Dispatch the project's agent for this role from `.claude/agents/` when one exists, with this as its prompt; `general-purpose` only when none does (`../using-superpowers/references/subagents.md`).
 
 ```
 Subagent (general-purpose):

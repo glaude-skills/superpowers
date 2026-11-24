@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # context-check — gate for the project document rules in using-superpowers
-# ("Project Policy" and "Work Records Stay in the Project").
+# (references/project-policy.md, references/work-records.md, and the law in
+# references/context-budget.md).
 #
 # Checks, from the repo root:
 #   1. every `@path` import in the entry chain exists        (fail)
@@ -11,6 +12,12 @@
 #      (--exempt PATH skips one document; record why in docs/tech-debt/)
 #   5. no shared list file every branch writes:
 #      .ai/status/STATUS.md / TASKS.md                        (warn — legacy bootstrap)
+#   6. no dead document path: every backticked `.ai/...md` or `docs/...md` path in
+#      the entry chain (outside code fences, without placeholders such as <slug>)
+#      exists                                                 (fail)
+#
+# All violations are reported in one run, so nobody fixes one, reruns, and
+# gives up on the gate.
 #
 # Caps ratchet: lower them when you can, never raise them to make room —
 # a new rule goes in only when as much comes out.
@@ -108,6 +115,14 @@ done
 # 5. shared list files
 for s in .ai/status/STATUS.md .ai/status/TASKS.md; do
   [ -f "$s" ] && warn "$s is a list every branch writes — move each task's state to .ai/status/<slug>.md"
+done
+
+# 6. dead document paths (a routing row that points nowhere is never read)
+for f in "${chain[@]}"; do
+  while IFS= read -r p; do
+    [ -z "$p" ] && continue
+    [ -e "$p" ] || report "$f names \`$p\` — file not found; fix the path or remove the row"
+  done < <(body "$f" | grep -oE '`(\.ai|docs)/[^`<>*{}$[:space:]]+\.md`' | tr -d '`' | sort -u || true)
 done
 
 if [ "$fail" -eq 0 ]; then

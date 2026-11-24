@@ -31,7 +31,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 **2. Dispatch code reviewer subagent:**
 
-Dispatch the project's code-review agent (`.claude/agents/`, read-only) if it has one, else a `general-purpose` subagent, filling the template at [code-reviewer.md](code-reviewer.md). Pass no `model` argument (using-superpowers, Subagents and Stop Points)
+Dispatch the project's code-review agent (`.claude/agents/`, read-only) if it has one, else a `general-purpose` subagent, filling the template at [code-reviewer.md](code-reviewer.md). Pass no `model` argument (`../using-superpowers/references/subagents.md`)
 
 **Placeholders:**
 - `{DESCRIPTION}` - Brief summary of what you built

@@ -6,7 +6,7 @@ Use this template for the second seat of a whole-branch review, dispatched **in 
 **Purpose:** Check the branch against what was agreed — the frozen DoD, the spec and plan, and the
 project's written rules. Bugs and regressions belong to the other seat.
 
-Dispatch the project's agent for this role from `.claude/agents/` when one exists, with this as its prompt; `general-purpose` only when none does (using-superpowers, Subagents and Stop Points).
+Dispatch the project's agent for this role from `.claude/agents/` when one exists, with this as its prompt; `general-purpose` only when none does (`../using-superpowers/references/subagents.md`).
 
 ```
 Subagent (general-purpose):
@@ -73,5 +73,5 @@ Subagent (general-purpose):
 - `[DOD_PATH]` — `docs/work/<slug>/dod.md`, or `none` if no DoD exists
 - `[SPEC_PATH]`, `[PLAN_PATH]` — `docs/work/<slug>/design.md`, `plan.md`
 - `[RULE_DOCS]` — the documents the project's routing table assigns to the changed paths
-  (see the `.ai/` policy in superpowers:using-superpowers), or `none`
+  (see the `.ai/` policy in `../using-superpowers/references/project-policy.md`), or `none`
 - `[BASE_SHA]`, `[HEAD_SHA]` — the branch range

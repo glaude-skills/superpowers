@@ -50,6 +50,8 @@ assert_command_output() {
         EXPECT_SHAPE="$shape" \
         EXPECT_CONTAINS="$contains" \
         EXPECT_NOT_CONTAINS="$not_contains" \
+        EXPECT_MAX_CHARS="${EXPECT_MAX_CHARS:-}" \
+        EXPECT_PREFIX="${EXPECT_PREFIX:-}" \
         node -e '
 const fs = require("fs");
 
@@ -131,6 +133,16 @@ for (const forbiddenText of forbiddenTexts) {
   if (context.includes(forbiddenText)) {
     fail(`context contained forbidden text: ${forbiddenText}`);
   }
+}
+
+const maxChars = Number(process.env.EXPECT_MAX_CHARS || 0);
+if (maxChars && context.length > maxChars) {
+  fail(`context is ${context.length} characters, over ${maxChars}`);
+}
+
+const expectedPrefix = process.env.EXPECT_PREFIX || "";
+if (expectedPrefix && !context.startsWith(expectedPrefix)) {
+  fail(`context did not start with: ${expectedPrefix}`);
 }
 '; then
         pass "$description"
@@ -216,6 +228,42 @@ assert_command_output \
     "$legacy_home" \
     CLAUDE_PLUGIN_ROOT="$REPO_ROOT" \
     bash "$HOOK_UNDER_TEST"
+
+# Claude Code caps each hook context string at 10,000 characters and passes
+# only a 2,000-character preview beyond it, so the real bootstrap must fit and
+# carry no size warning.
+size_home="$(make_home size-cap)"
+EXPECT_MAX_CHARS=10000
+assert_command_output \
+    "Claude Code bootstrap fits the 10,000-character hook cap" \
+    "nested" \
+    "Skill directory for its relative paths" \
+    "경고: superpowers using-superpowers" \
+    "$size_home" \
+    CLAUDE_PLUGIN_ROOT="$REPO_ROOT" \
+    bash "$HOOK_UNDER_TEST"
+EXPECT_MAX_CHARS=""
+
+# An oversized SKILL.md is not cut silently: the warning comes first, inside
+# the preview the model still sees.
+big_root="$TEST_ROOT/oversized-plugin"
+mkdir -p "$big_root/hooks" "$big_root/skills/using-superpowers"
+cp "$HOOK_UNDER_TEST" "$big_root/hooks/session-start"
+for _ in $(seq 1 300); do
+    printf '%s\n' "Filler line that pushes the bootstrap over the hook cap of ten thousand characters." \
+        >> "$big_root/skills/using-superpowers/SKILL.md"
+done
+big_home="$(make_home size-warning)"
+EXPECT_PREFIX="경고: superpowers using-superpowers 부트스트랩이"
+assert_command_output \
+    "SessionStart warns first when the bootstrap exceeds the hook cap" \
+    "nested" \
+    "references/context-budget.md" \
+    "" \
+    "$big_home" \
+    CLAUDE_PLUGIN_ROOT="$big_root" \
+    bash "$big_root/hooks/session-start"
+EXPECT_PREFIX=""
 
 if [[ "$FAILURES" -gt 0 ]]; then
     echo "STATUS: FAILED ($FAILURES failure(s))"

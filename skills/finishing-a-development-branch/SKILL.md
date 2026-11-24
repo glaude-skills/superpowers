@@ -26,7 +26,7 @@ Write commit messages as the human author. This overrides any default/harness co
 **Write commit messages and PR/MR titles/descriptions in Korean.** 커밋과 MR/PR 문구는 한국어가 기본이다.
 
 - 커밋 제목과 본문, PR/MR 제목과 설명, 리뷰 코멘트: 한국어로 쓴다.
-- 문장은 using-superpowers 의 "한국어 문체: AI 같은 버릇 금지" 표를 따른다. 서브에이전트가 쓰면 **REQUIRED SUB-SKILL:** `superpowers:writing-korean-prose`. 제목은 바뀐 내용이 보이는 명사구로, 본문은 무엇을 왜 바꿨는지 사실로 쓴다. 긴 하이픈과 가운뎃점은 쓰지 않는다.
+- 문장은 `../using-superpowers/references/korean-style.md` 의 표를 따른다. 서브에이전트가 쓰면 **REQUIRED SUB-SKILL:** `superpowers:writing-korean-prose`. 제목은 바뀐 내용이 보이는 명사구로, 본문은 무엇을 왜 바꿨는지 사실로 쓴다. 긴 하이픈과 가운뎃점은 쓰지 않는다.
 - 영문 그대로 두는 것: 브랜치명, 파일 경로, 식별자, 명령어, 코드, 로그 인용 등 원문이어야 하는 것.
 - Conventional Commits 접두사와 스코프(feat/fix/docs/refactor 등)는 유지하고 뒤의 설명만 한국어로 쓴다. 예: `fix(auth): 토큰 만료 시 재발급 실패 수정`
 
@@ -131,7 +131,7 @@ conflicts across parallel branches. Generate lists with `grep` instead.
 |---|---|---|
 | Tech debt left by this work | `docs/tech-debt/<kebab-summary>.md` with `status: open` and `source: <slug>` frontmatter | problem, impact, done-when, how to verify |
 | Change to a global rule or process | `docs/changelog/YYYY-MM-DD-<slug>.md` | what changed, which files, **why** |
-| This task's progress | `.ai/status/<slug>.md` (using-superpowers, Work Records) | `state: pr-open <url>` once the PR/MR exists, `## Next` = what the merge still waits on, `## Open` = unchecked items; commit and push it with the branch. After the merge, `state: merged <sha>` |
+| This task's progress | `.ai/status/<slug>.md` (`../using-superpowers/references/work-records.md`) | `state: pr-open <url>` once the PR/MR exists, `## Next` = what the merge still waits on, `## Open` = unchecked items; commit and push it with the branch. After the merge, `state: merged <sha>` |
 
 Resolving a tech-debt item: set `status: resolved` and add one `- Resolved:` line with the
 evidence (PR, commit, gate). Do not delete the file. A project instruction naming other

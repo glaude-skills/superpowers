@@ -82,5 +82,11 @@ if [[ $CODE -eq 0 && $OUT == *"WARN: .ai/status/STATUS.md"* ]]; then pass "share
 new_repo; rm CONTEXT.md; printf '# entry\n@.ai/CLAUDE.md\n' > CLAUDE.md; run
 if [[ $CODE -eq 0 && $OUT == *"(CLAUDE.md,"* ]]; then pass "CLAUDE.md entry without CONTEXT.md"; else fail "CLAUDE.md entry without CONTEXT.md: $OUT"; fi
 
+new_repo; printf '| when | `.ai/architecture/gone.md` | one line |\n' >> .ai/CLAUDE.md; run
+if [[ $CODE -eq 1 && $OUT == *"names \`.ai/architecture/gone.md\` — file not found"* ]]; then pass "dead routing path fails"; else fail "dead routing path fails: $OUT"; fi
+
+new_repo; printf 'see `docs/work/<slug>/design.md` and\n```\n`docs/fenced.md`\n```\n' >> .ai/CLAUDE.md; run
+if [[ $CODE -eq 0 ]]; then pass "placeholder and fenced paths are not dead references"; else fail "placeholder and fenced paths are not dead references: $OUT"; fi
+
 echo
 if [[ $FAILURES -eq 0 ]]; then echo "All context-check tests passed"; else echo "$FAILURES context-check test(s) failed"; exit 1; fi

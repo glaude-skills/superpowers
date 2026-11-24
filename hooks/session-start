@@ -23,8 +23,34 @@ escape_for_json() {
     printf '%s' "$s"
 }
 
-using_superpowers_escaped=$(escape_for_json "$using_superpowers_content")
-session_context="<EXTREMELY_IMPORTANT>\nYou have superpowers.\n\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_superpowers_escaped}\n</EXTREMELY_IMPORTANT>"
+nl=$'\n'
+# The skill keeps its detail in references/ and routes to it by relative path,
+# so name the directory those paths start from (a Windows path where the Read
+# tool expects one).
+skill_dir="${PLUGIN_ROOT}/skills/using-superpowers"
+if command -v cygpath >/dev/null 2>&1; then
+    skill_dir=$(cygpath -w "$skill_dir")
+fi
+context_head="<EXTREMELY_IMPORTANT>${nl}You have superpowers.${nl}${nl}**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**${nl}${nl}Skill directory for its relative paths (references/, scripts/): ${skill_dir}${nl}${nl}"
+context_tail="${nl}</EXTREMELY_IMPORTANT>"
+session_context_plain="${context_head}${using_superpowers_content}${context_tail}"
+
+# Size guard. Claude Code caps each hook context string at 10,000 characters;
+# over the cap it saves the text to a file and shows the model only the first
+# 2,000 characters, without asking it to read the rest. Up to 6.4.96 the
+# 54.7 KB bootstrap was cut that way in every session. Warn at the very front,
+# where the preview still shows it, instead of letting it be cut silently.
+# Characters are counted as UTF-8 code points (bytes minus continuation bytes),
+# so the count does not depend on the locale. The SKILL.md cap itself (9,000)
+# is checked by tests/claude-code/test-skill-context-budget.sh.
+CONTEXT_CHAR_CAP=10000
+context_chars=$(printf '%s' "$session_context_plain" | LC_ALL=C tr -d '\200-\277' | wc -c | tr -d '[:space:]')
+if [ "$context_chars" -gt "$CONTEXT_CHAR_CAP" ]; then
+    size_warning="경고: superpowers using-superpowers 부트스트랩이 ${context_chars}자로 hook 상한 ${CONTEXT_CHAR_CAP}자를 넘어 앞 2,000자만 전달될 수 있다. skills/using-superpowers/SKILL.md 의 상세를 references/ 로 옮겨야 한다(references/context-budget.md). 전체 내용은 아래 저장 파일 경로에 있다."
+    session_context_plain="${size_warning}${nl}${nl}${session_context_plain}"
+fi
+
+session_context=$(escape_for_json "$session_context_plain")
 
 # Output context injection as JSON.
 # Cursor hooks expect additional_context (snake_case).

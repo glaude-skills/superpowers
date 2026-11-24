@@ -7,9 +7,9 @@ description: Use when writing Korean that a person will read - commit messages, 
 
 사람이 읽는 한국어는 사람이 쓴 기술 문서처럼 쓴다. 규칙 표는 한 곳에만 있다.
 
-**정본:** 이 스킬의 Base directory 옆 `../using-superpowers/SKILL.md` 의 `### 한국어 문체: AI 같은 버릇 금지` 절. 그 제목부터 다음 제목 `### 사람에게 묻는 질문 쓰는 법` 바로 앞까지 읽고 따른다. 그 파일 맨 위의 SUBAGENT-STOP 은 부트스트랩 전체에 대한 말이고, 이 절을 읽는 데는 해당하지 않는다.
+**정본:** 이 스킬의 Base directory 옆 `../using-superpowers/references/korean-style.md`. 파일 전체를 읽고 따른다.
 
-세션 시작 때 using-superpowers 를 이미 받은 컨트롤러는 그 절이 컨텍스트에 있으니 다시 읽지 않는다. 서브에이전트, 다른 세션에서 넘겨받은 작업처럼 그 절이 컨텍스트에 없을 때 읽는다.
+세션 시작 때 들어오는 using-superpowers 에는 부류별 한 줄 요약만 있다(6.4.97 부터). 컨트롤러도 이 세션에서 그 파일을 아직 읽지 않았으면 사람이 읽는 한국어를 쓰기 전에 읽는다. 서브에이전트, 다른 세션에서 넘겨받은 작업도 같다.
 
 ## 쓰기 전에 기억할 것
 
@@ -25,4 +25,4 @@ description: Use when writing Korean that a person will read - commit messages, 
 ## 다른 문서와의 관계
 
 - 블로그 원고용 상세본은 tech-blog 저장소 `docs/writing/ai-style.md` 다. 그 저장소 안에서 글을 쓸 때는 그 파일을 먼저 읽는다
-- 경민님이 새로 지적한 표현은 using-superpowers 의 절과 `ai-style.md` 두 곳에 함께 넣는다. 이 스킬에는 표를 복사하지 않는다
+- 경민님이 새로 지적한 표현은 `../using-superpowers/references/korean-style.md` 와 `ai-style.md` 두 곳에 함께 넣는다. 부류 요약이 바뀌면 using-superpowers SKILL.md 의 부류별 한 줄도 고친다. 이 스킬에는 표를 복사하지 않는다
